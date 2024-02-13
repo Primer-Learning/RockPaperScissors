@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://p271qwxuywyj"]
+
+[ext_resource type="Script" path="res://SimRunner.cs" id="1_umbgv"]
+
+[node name="SimRunner" type="Node3D"]
+script = ExtResource("1_umbgv")
