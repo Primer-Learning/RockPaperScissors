@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://p271qwxuywyj"]
+[gd_scene load_steps=3 format=3 uid="uid://p271qwxuywyj"]
 
-[ext_resource type="Script" path="res://SimRunner.cs" id="1_umbgv"]
+[ext_resource type="Script" path="res://SimRunner2.cs" id="1_260nm"]
+[ext_resource type="Script" path="res://SimRunner.cs" id="2_5tvp0"]
 
-[node name="SimRunner" type="Node3D"]
-script = ExtResource("1_umbgv")
+[node name="SimRunner2" type="Node3D"]
+script = ExtResource("1_260nm")
+
+[node name="SimRunner1" type="Node3D" parent="."]
+script = ExtResource("2_5tvp0")
