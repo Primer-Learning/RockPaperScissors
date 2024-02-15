@@ -6,7 +6,7 @@ namespace RockPaperScissors;
 /// <summary>
 /// A memory pool that we can reset every simulation step
 /// </summary>
-public static class Arena<T>
+public static class MemoryPool<T>
 {
     private static readonly Stack<List<T>> _listPool = new();
     private static readonly Dictionary<int, Stack<T[]>> _arrayPool = new();

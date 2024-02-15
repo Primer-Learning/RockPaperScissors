@@ -84,9 +84,9 @@ public partial class SimRunner3 : Node
                     // important to print results before arena reclaims all the lists. Otherwise all the entity lists will be cleared.
                     // PrintResults(entitiesPerDay);
                     
-                    Arena<Entity>.ReclaimAll();
-                    Arena<EntityId>.ReclaimAll();
-                    Arena<Strategy>.ReclaimAll();
+                    MemoryPool<Entity>.ReclaimAll();
+                    MemoryPool<EntityId>.ReclaimAll();
+                    MemoryPool<Strategy>.ReclaimAll();
                 }
                 
                 stopwatch.Stop();
@@ -101,7 +101,7 @@ public partial class SimRunner3 : Node
     private void Initialize(List<Entity>[] entitiesPerDay)
     {
         // var blobs = new List<Entity>();
-        var blobs = Arena<Entity>.BorrowList();
+        var blobs = MemoryPool<Entity>.BorrowList();
         for (var i = 0; i < InitialBlobCount; i++)
         {
             // I think this is more clear than i % 4 > 2 ? 0 : i % 4
@@ -132,12 +132,12 @@ public partial class SimRunner3 : Node
             // Shuffle last day parents, but use a borrowed array to avoid allocations
             var lastDayParents = entitiesPerDay[i - 1];
             // var shuffledParents = new List<Entity>();
-            var shuffledParents = Arena<Entity>.BorrowList();
+            var shuffledParents = MemoryPool<Entity>.BorrowList();
             shuffledParents.AddRange(lastDayParents);
             shuffledParents.Shuffle(_rng);
 
             // var todayChildren = new List<Entity>();
-            var todayChildren = Arena<Entity>.BorrowList();
+            var todayChildren = MemoryPool<Entity>.BorrowList();
             for (var j = 0; j < shuffledParents.Count; j += 2)
             {
                 var parent1 = shuffledParents[j];
