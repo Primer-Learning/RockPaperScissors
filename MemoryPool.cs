@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace RockPaperScissors;
 
 /// <summary>
-/// A memory pool that we can reset every simulation step
+/// A memory pool that can reclaim all borrowed memory at once.
 /// </summary>
 public static class MemoryPool<T>
 {
