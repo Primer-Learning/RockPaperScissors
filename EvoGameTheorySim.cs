@@ -7,7 +7,7 @@ using EntityID = System.Int32;
 using ParentID = System.Int32;
 
 [Tool]
-public partial class SimRunner4 : Node
+public partial class EvoGameTheorySim : Node
 {
 	#region Running toggle
     private bool _run = true;
@@ -17,15 +17,16 @@ public partial class SimRunner4 : Node
 			var oldRun = _run;
 			_run = value;
 			if (_run && !oldRun && Engine.IsEditorHint()) { // Avoids running on build
-				var stopwatch = Stopwatch.StartNew();
-				for (var i = 0; i < 100; i++)
-				{
-					Initialize();
-					Simulate();
-				}
-				stopwatch.Stop();
-				GD.Print("Elapsed time: " + stopwatch.ElapsedMilliseconds + "ms");
-				// PrintResults();
+				// Loop for speed testing
+				// var stopwatch = Stopwatch.StartNew();
+				// for (var i = 0; i < 100; i++)
+				// {
+				// }
+				// stopwatch.Stop();
+				// GD.Print("Elapsed time: " + stopwatch.ElapsedMilliseconds + "ms");
+				Initialize();
+				Simulate();
+				PrintResults();
 			}
 		}
 	}
@@ -35,7 +36,6 @@ public partial class SimRunner4 : Node
 	private struct EntityRegistry
 	{
 		private static EntityID _nextId;
-		
 		public static readonly List<RPSGame.Strategy> Strategies = new();
 		public static readonly List<ParentID> Parents = new();
 		
@@ -63,7 +63,7 @@ public partial class SimRunner4 : Node
 			return (RewardMatrix[(int)strategy1, (int)strategy2], RewardMatrix[(int)strategy2, (int)strategy1]);
 		}
 		
-		private const float WinMagnitude = 1.0f;
+		private const float WinMagnitude = 0.5f;
 		private static readonly float[,] RewardMatrix = new float[3, 3] {
 			{ 1, 1 - WinMagnitude, 1 + WinMagnitude }, // Rock rewards
 			{ 1 + WinMagnitude, 1, 1 - WinMagnitude }, // Paper rewards   
@@ -74,9 +74,9 @@ public partial class SimRunner4 : Node
 	#region Parameters
 	private Rng _rng;
 	[Export] public int Seed = -1;
-	private const int NumDays = 100;
-	private const int InitialBlobCount = 3200;
-	// private const int NumTrees = 150;
+	private const int NumDays = 20;
+	private const int InitialBlobCount = 32;
+	private const int NumTrees = 150;
 	
 	#endregion
 
@@ -112,21 +112,24 @@ public partial class SimRunner4 : Node
 		for (var i = 1; i <= NumDays; i++)
 		{
 			var shuffledParents = EntitiesByDay[i - 1].ShuffleToList(rng: _rng).ToArray();
+
+			var numGames = shuffledParents.Length - NumTrees;
+			numGames = Mathf.Max(numGames, 0);
+			numGames = Mathf.Min(numGames, NumTrees);
 			
-			// var childEntities = new List<EntityID>();
 			var dailyChildren = new List<EntityID>();
-			for (var j = 0; j < shuffledParents.Length; j += 2)
+			for (var j = 0; j < numGames * 2; j += 2)
 			{
-				var parent1 = EntityRegistry.Strategies[shuffledParents[j]];
-				var parent2 = EntityRegistry.Strategies[shuffledParents[j+1]];
+				var parent1Strategy = EntityRegistry.Strategies[shuffledParents[j]];
+				var parent2Stategy = EntityRegistry.Strategies[shuffledParents[j+1]];
 				
-				var (reward1, reward2) = RPSGame.GetRewards(parent1, parent2);
+				var (reward1, reward2) = RPSGame.GetRewards(parent1Strategy, parent2Stategy);
 				
 				for (var k = 0; k < GetOffspringCount(reward1); k++)
 				{
 					dailyChildren.Add(
 						EntityRegistry.CreateBlob(
-							parent1, // weird name, but it's just the strategy
+							parent1Strategy,
 							shuffledParents[j]
 						)
 					);
@@ -135,12 +138,36 @@ public partial class SimRunner4 : Node
 				{
 					dailyChildren.Add(
 						EntityRegistry.CreateBlob(
-							parent2, // weird name, but it's just the strategy
+							parent2Stategy,
 							shuffledParents[j]
 						)
 					);
 				}
 			}
+
+			for (var j = numGames * 2; j < shuffledParents.Length; j += 1)
+			{
+				if (numGames < NumTrees)
+				{
+					var parentStrategy = EntityRegistry.Strategies[shuffledParents[j]];
+					dailyChildren.Add(
+						EntityRegistry.CreateBlob(
+							parentStrategy,
+							shuffledParents[j]
+						)
+					);
+					dailyChildren.Add(
+						EntityRegistry.CreateBlob(
+							parentStrategy,
+							shuffledParents[j]
+						)
+					);
+				}
+				// Else they die, which is just not reproducing, so do nothing
+			}
+			
+
+			
 			EntitiesByDay[i] = dailyChildren;
 		}
 	}
@@ -165,13 +192,12 @@ public partial class SimRunner4 : Node
 
 	private void PrintResults()
 	{
-		foreach (var (day, entities) in EntitiesByDay.WithIndex())
+		foreach (var (day, entitiesToday) in EntitiesByDay.WithIndex())
 		{
-			// GD.Print(entities.Length);
-			GD.Print($"Day {day}");
-			var fractionRock = entities.Count(s => EntityRegistry.Strategies[s] == RPSGame.Strategy.Rock) / (float)entities.Count;
-			var fractionPaper = entities.Count(s => EntityRegistry.Strategies[s] == RPSGame.Strategy.Paper) / (float)entities.Count;
-			var fractionScissors = entities.Count(s => EntityRegistry.Strategies[s] == RPSGame.Strategy.Scissors) / (float)entities.Count;
+			GD.Print($"Day {day} total: {entitiesToday.Count}");
+			var fractionRock = entitiesToday.Count(s => EntityRegistry.Strategies[s] == RPSGame.Strategy.Rock) / (float)entitiesToday.Count;
+			var fractionPaper = entitiesToday.Count(s => EntityRegistry.Strategies[s] == RPSGame.Strategy.Paper) / (float)entitiesToday.Count;
+			var fractionScissors = entitiesToday.Count(s => EntityRegistry.Strategies[s] == RPSGame.Strategy.Scissors) / (float)entitiesToday.Count;
 			// Print the fractions formatted to two decimal places
 			GD.Print($"Rock: {fractionRock:P1}, Paper: {fractionPaper:P1}, Scissors: {fractionScissors:P1}");
 		}
