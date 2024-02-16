@@ -20,7 +20,7 @@ public partial class SimRunner2 : Node
 			_run = value;
 			if (_run && !oldRun && Engine.IsEditorHint()) { // Avoids running on build
 				var stopwatch = Stopwatch.StartNew();
-				for (int i = 0; i < 1; i++)
+				for (int i = 0; i < 100; i++)
 				{
 					Initialize();
 					Simulate();
@@ -89,7 +89,7 @@ public partial class SimRunner2 : Node
 	{
 		for (var i = 1; i <= NumDays; i++)
 		{
-			var shuffledParents = EntitiesByDay[i - 1].Shuffle(rng: _rng).ToArray();
+			var shuffledParents = EntitiesByDay[i - 1].ShuffleToList(rng: _rng).ToArray();
 			
 			// var childEntities = new List<EntityID>();
 			dailyChildren.Clear();

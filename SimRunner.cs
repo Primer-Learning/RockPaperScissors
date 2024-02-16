@@ -83,7 +83,7 @@ public partial class SimRunner : Node3D
 			{
 				mappingArray[j] = j;
 			}
-			mappingArray = mappingArray.Shuffle(rng: _rng).ToArray();
+			mappingArray = mappingArray.ShuffleToList(rng: _rng).ToArray();
 			
 			var shuffledStrategies = new int[_blobStrategies.Length];
 			for (var j = 0; j < _blobStrategies.Length; j++)

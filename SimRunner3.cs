@@ -70,7 +70,7 @@ public partial class SimRunner3 : Node
 
                 _rng = new Rng(seed);
 
-                for (int i = 0; i < 1; i++)
+                for (int i = 0; i < 100; i++)
                 {
                     // If you want every run to be the same, uncomment the line below
                     // _rng = new Rng(seed);
@@ -84,9 +84,9 @@ public partial class SimRunner3 : Node
                     // important to print results before arena reclaims all the lists. Otherwise all the entity lists will be cleared.
                     // PrintResults(entitiesPerDay);
                     
-                    MemoryPool<Entity>.ReclaimAll();
-                    MemoryPool<EntityId>.ReclaimAll();
-                    MemoryPool<Strategy>.ReclaimAll();
+                    // MemoryPool<Entity>.ReclaimAll();
+                    // MemoryPool<EntityId>.ReclaimAll();
+                    // MemoryPool<Strategy>.ReclaimAll();
                 }
                 
                 stopwatch.Stop();
