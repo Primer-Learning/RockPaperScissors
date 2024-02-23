@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using Godot;
 using PrimerTools;
 using System.Linq;
@@ -17,20 +16,18 @@ public partial class EvoGameTheorySim : Node
 			var oldRun = _run;
 			_run = value;
 			if (_run && !oldRun && Engine.IsEditorHint()) { // Avoids running on build
-				// Loop for speed testing
-				// var stopwatch = Stopwatch.StartNew();
-				// for (var i = 0; i < 100; i++)
-				// {
-				// }
-				// stopwatch.Stop();
-				// GD.Print("Elapsed time: " + stopwatch.ElapsedMilliseconds + "ms");
-				Initialize();
-				Simulate();
+				RunSim();
 				PrintResults();
 			}
 		}
 	}
 	#endregion
+
+	public void RunSim()
+	{
+		Initialize();
+		Simulate();
+	}
 
 	#region Entity Registry
 	private struct EntityRegistry
@@ -60,30 +57,36 @@ public partial class EvoGameTheorySim : Node
 		
 		public static (float reward1, float reward2) GetRewards(Strategy strategy1, Strategy strategy2)
 		{
-			return (RewardMatrix[(int)strategy1, (int)strategy2], RewardMatrix[(int)strategy2, (int)strategy1]);
+			return (RewardMatrix[(int)strategy1, (int)strategy2], RewardMatrix[(int)strategy2, (int)strategy1] - GlobalCost);
 		}
 		
-		private const float WinMagnitude = 0.5f;
+		private const float GlobalCost = 0.0f;
+		
+		private const float WinMagnitude = 0.1f;
+		private const float TieCost = 0.02f;
 		private static readonly float[,] RewardMatrix = new float[3, 3] {
-			{ 1, 1 - WinMagnitude, 1 + WinMagnitude }, // Rock rewards
-			{ 1 + WinMagnitude, 1, 1 - WinMagnitude }, // Paper rewards   
-			{ 1 - WinMagnitude, 1 + WinMagnitude, 1 }  // Scissors rewards
+			{ 1 - TieCost, 1 - WinMagnitude, 1 + 2 * WinMagnitude }, // Rock rewards
+			{ 1 + WinMagnitude, 1 - TieCost, 1 - WinMagnitude }, // Paper rewards   
+			{ 1 - WinMagnitude, 1 + WinMagnitude, 1 - TieCost}  // Scissors rewards
 		};
 	}
 	
 	#region Parameters
 	private Rng _rng;
 	[Export] public int Seed = -1;
-	private const int NumDays = 20;
+	public int NumDays = 20;
 	private const int InitialBlobCount = 32;
-	private const int NumTrees = 150;
+	private const int NumTrees = 15000;
 	
 	#endregion
 
 	#region Simulation
-	private static readonly List<EntityID>[] EntitiesByDay = new List<EntityID>[NumDays + 1];
+
+	private List<EntityID>[] _entitiesByDay;// = new List<EntityID>[21];
 	private void Initialize()
 	{
+		_entitiesByDay = new List<EntityID>[NumDays + 1];
+		
 		_rng = new Rng(Seed == -1 ? System.Environment.TickCount : Seed);
 		
 		var blobIDs = new List<EntityID>();
@@ -105,13 +108,13 @@ public partial class EvoGameTheorySim : Node
 				-1
 			));
 		}
-		EntitiesByDay[0] = blobIDs;
+		_entitiesByDay[0] = blobIDs;
 	}
 	private void Simulate()
 	{
 		for (var i = 1; i <= NumDays; i++)
 		{
-			var shuffledParents = EntitiesByDay[i - 1].ShuffleToList(rng: _rng).ToArray();
+			var shuffledParents = _entitiesByDay[i - 1].ShuffleToList(rng: _rng).ToArray();
 
 			var numGames = shuffledParents.Length - NumTrees;
 			numGames = Mathf.Max(numGames, 0);
@@ -168,7 +171,7 @@ public partial class EvoGameTheorySim : Node
 			
 
 			
-			EntitiesByDay[i] = dailyChildren;
+			_entitiesByDay[i] = dailyChildren;
 		}
 	}
 	private int GetOffspringCount(float reward)
@@ -192,7 +195,7 @@ public partial class EvoGameTheorySim : Node
 
 	private void PrintResults()
 	{
-		foreach (var (day, entitiesToday) in EntitiesByDay.WithIndex())
+		foreach (var (day, entitiesToday) in _entitiesByDay.WithIndex())
 		{
 			GD.Print($"Day {day} total: {entitiesToday.Count}");
 			var fractionRock = entitiesToday.Count(s => EntityRegistry.Strategies[s] == RPSGame.Strategy.Rock) / (float)entitiesToday.Count;
@@ -201,5 +204,17 @@ public partial class EvoGameTheorySim : Node
 			// Print the fractions formatted to two decimal places
 			GD.Print($"Rock: {fractionRock:P1}, Paper: {fractionPaper:P1}, Scissors: {fractionScissors:P1}");
 		}
+	}
+	public Vector3[] GetStrategyFrequenciesByDay()
+	{
+		var frequencies = new Vector3[NumDays + 1];
+		foreach (var (day, entitiesToday) in _entitiesByDay.WithIndex())
+		{
+			var fractionRock = entitiesToday.Count(s => EntityRegistry.Strategies[s] == RPSGame.Strategy.Rock) / (float)entitiesToday.Count;
+			var fractionPaper = entitiesToday.Count(s => EntityRegistry.Strategies[s] == RPSGame.Strategy.Paper) / (float)entitiesToday.Count;
+			var fractionScissors = entitiesToday.Count(s => EntityRegistry.Strategies[s] == RPSGame.Strategy.Scissors) / (float)entitiesToday.Count;
+			frequencies[day] = new Vector3(fractionRock, fractionPaper, fractionScissors);
+		}
+		return frequencies;
 	}
 }
