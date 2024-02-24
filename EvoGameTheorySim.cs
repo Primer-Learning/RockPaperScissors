@@ -2,6 +2,7 @@
 using Godot;
 using PrimerTools;
 using System.Linq;
+using Primer;
 using EntityID = System.Int32;
 using ParentID = System.Int32;
 
@@ -84,40 +85,42 @@ public partial class EvoGameTheorySim : Node
 	#region Simulation
 
 	public List<EntityID>[] EntitiesByDay;// = new List<EntityID>[21];
-	private void Initialize()
-	{
-		EntitiesByDay = new List<EntityID>[NumDays + 1];
-		
-		_rng = new Rng(Seed == -1 ? System.Environment.TickCount : Seed);
-		
-		var blobIDs = new List<EntityID>();
-		for (var i = 0; i < InitialBlobCount; i++)
-		{
-			// var strategy = new Game.Player((Game.Strategy)(i % 3)); // Even mix
-			// var strategy = new Game.Player((Game.Strategy)_rng.RangeInt(3)); // Random mix
-			var strategy = (i % 4) switch
-			{
-				0 => RPSGame.Strategy.Rock,
-				1 => RPSGame.Strategy.Paper,
-				2 => RPSGame.Strategy.Scissors,
-				3 => RPSGame.Strategy.Rock,
-				_ => throw new System.Exception("This should never happen")
-			};
-			
-			blobIDs.Add(Registry.CreateBlob(
-				strategy,
-				-1
-			));
-		}
-		EntitiesByDay[0] = blobIDs;
-	}
+	public List<EntityID>[] ShuffledParents;
+     	private void Initialize()
+     	{
+     		EntitiesByDay = new List<EntityID>[NumDays + 1];
+     		
+     		_rng = new Rng(Seed == -1 ? System.Environment.TickCount : Seed);
+     		
+     		var blobIDs = new List<EntityID>();
+     		for (var i = 0; i < InitialBlobCount; i++)
+     		{
+     			// var strategy = new Game.Player((Game.Strategy)(i % 3)); // Even mix
+     			// var strategy = new Game.Player((Game.Strategy)_rng.RangeInt(3)); // Random mix
+     			var strategy = (i % 4) switch
+     			{
+     				0 => RPSGame.Strategy.Rock,
+     				1 => RPSGame.Strategy.Paper,
+     				2 => RPSGame.Strategy.Scissors,
+     				3 => RPSGame.Strategy.Rock,
+     				_ => throw new System.Exception("This should never happen")
+     			};
+     			
+     			blobIDs.Add(Registry.CreateBlob(
+     				strategy,
+     				-1
+     			));
+     		}
+     		EntitiesByDay[0] = blobIDs;
+     	}
 	private void Simulate()
 	{
 		for (var i = 1; i <= NumDays; i++)
 		{
-			var shuffledParents = EntitiesByDay[i - 1].ShuffleToList(rng: _rng).ToArray();
+			// Parents are already shuffled, since they were shuffled at the end of the last iteration of the loop
+			var shuffledParents = EntitiesByDay[i - 1];
 
-			var numGames = shuffledParents.Length - NumTrees;
+			var numGames = shuffledParents.Count - NumTrees;
 			numGames = Mathf.Max(numGames, 0);
 			numGames = Mathf.Min(numGames, NumTrees);
 			
@@ -149,7 +152,7 @@ public partial class EvoGameTheorySim : Node
 				}
 			}
 
-			for (var j = numGames * 2; j < shuffledParents.Length; j += 1)
+			for (var j = numGames * 2; j < shuffledParents.Count; j += 1)
 			{
 				if (numGames < NumTrees)
 				{
@@ -170,9 +173,8 @@ public partial class EvoGameTheorySim : Node
 				// Else they die, which is just not reproducing, so do nothing
 			}
 			
-
-			
-			EntitiesByDay[i] = dailyChildren;
+			// Shuffle at the end of the loop so entities are sorted by tree for the next day
+			EntitiesByDay[i] = dailyChildren.ShuffleToList(rng: _rng);
 		}
 	}
 	private int GetOffspringCount(float reward)
@@ -218,4 +220,11 @@ public partial class EvoGameTheorySim : Node
 		}
 		return frequencies;
 	}
+	
+	public Dictionary<RPSGame.Strategy, Color> StrategyColors = new()
+	{
+		{ RPSGame.Strategy.Rock, PrimerColor.red },
+		{ RPSGame.Strategy.Paper, PrimerColor.blue },
+		{ RPSGame.Strategy.Scissors, PrimerColor.green }
+	};
 }
