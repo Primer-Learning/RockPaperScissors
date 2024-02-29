@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Primer;
 using PrimerTools;
 using PrimerTools.AnimationSequence;
 using PrimerTools.Graph;
@@ -10,19 +11,26 @@ public partial class PlottedSimTest : AnimationSequence
 {
     protected override void Define()
     {
+        var stopwatch = new System.Diagnostics.Stopwatch();
+        stopwatch.Start();
+        
         // Run the simulation
         var sim = new EvoGameTheorySim();
         AddChild(sim);
-        sim.NumDays = 10;
+        sim.NumDays = 5;
         sim.InitialBlobCount = 4;
-        sim.NumTrees = 50;
+        sim.NumTrees = 20;
         sim.RunSim();
         var results = sim.GetStrategyFrequenciesByDay();
+        
+        GD.Print("Sim time: " + stopwatch.ElapsedMilliseconds);
+        stopwatch.Restart();
 
         #region Animate the results
 
         // Make the ground plane
         var ground = new MeshInstance3D();
+        ground.Name = "Ground";
         AddChild(ground);
         ground.Owner = GetTree().EditedSceneRoot;
         
@@ -49,6 +57,8 @@ public partial class PlottedSimTest : AnimationSequence
             tree.Position = new Vector3(simVisualizationRng.RangeFloat(-5, 5), 0, simVisualizationRng.RangeFloat(-5, 5));
             trees.Add(tree);
         }
+        GD.Print("Tree and ground time: " + stopwatch.ElapsedMilliseconds);
+        stopwatch.Restart();
         
         // Add homes
         var homeScene = ResourceLoader.Load<PackedScene>("res://addons/PrimerAssets/Organized/Rocks/rock_home_11.tscn");
@@ -65,14 +75,20 @@ public partial class PlottedSimTest : AnimationSequence
         }
         
         // Spawn and move blobs according to the results
+        GD.Print("Homes time: " + stopwatch.ElapsedMilliseconds);
+        stopwatch.Restart();
         
         // Initial blobs spawn in random homes
         var blobScene = ResourceLoader.Load<PackedScene>("res://addons/PrimerAssets/Organized/Blob/Blobs/blob.tscn");
+        var blobPool = new Pool<Blob>(blobScene);
         var blobs = new Dictionary<int, Blob>();
+        var parentPositions = new Dictionary<int, Vector3>();
         // var blobAnimation = new Animation();
         var dailyAnimations = new List<Animation>();
+        var dayCount = 0;
         foreach (var entitiesToday in sim.EntitiesByDay)
         {
+            dayCount++;
             // TODO: Idea: Make a single loop that processes a whole blob day.
             // In the old situation, we needed blobs to show up so the sim would know what to do next.
             // But now all the data is there already, so we could process a whole blob day in one go.
@@ -82,18 +98,23 @@ public partial class PlottedSimTest : AnimationSequence
             var appearanceAnimations = new List<Animation>();
             foreach (var entityId in entitiesToday)
             {
-                var blob = blobScene.Instantiate<Blob>();
+                var blob = blobPool.GetFromPool();
                 blobs.Add(entityId, blob);
-                ground.AddChild(blob);
+                if (blob.GetParent() == null) ground.AddChild(blob);
+                blob.MakeChildrenLocalRecursively(GetTree().EditedSceneRoot);
                 blob.Owner = GetTree().EditedSceneRoot;
                 blob.Name = "Blob";
                 blob.Scale = Vector3.Zero;
 
-                appearanceAnimations.Add(blob.ScaleTo(Vector3.One * 0.1f));
-                blob.SetColor(sim.StrategyColors[sim.Registry.Strategies[entityId]]);
-                
                 var parent = sim.Registry.Parents[entityId];
-                blob.Position = parent == -1 ? homes[simVisualizationRng.RangeInt(homes.Count)].Position : blobs[parent].Position;
+                var pos = parent == -1 ? homes[simVisualizationRng.RangeInt(homes.Count)].Position : parentPositions[parent];
+                appearanceAnimations.Add(
+                    AnimationUtilities.Parallel(
+                        blob.MoveTo(pos, duration: 0.001f),
+                        blob.ScaleTo(Vector3.One * 0.1f),
+                        blob.AnimateColor(sim.StrategyColors[sim.Registry.Strategies[entityId]])
+                    )
+                );
             }
             
             // Move blobs to trees
@@ -122,18 +143,31 @@ public partial class PlottedSimTest : AnimationSequence
             foreach (var entityId in entitiesToday)
             {
                 var blob = blobs[entityId];
-                toHomeAnimations.Add(blob.MoveTo(homes[simVisualizationRng.RangeInt(homes.Count)].Position));
+                // toHomeAnimations.Add(blob.MoveTo(homes[simVisualizationRng.RangeInt(homes.Count)].Position));
+                toHomeAnimations.Add(
+                    AnimationUtilities.Series(
+                        blob.MoveTo(homes[simVisualizationRng.RangeInt(homes.Count)].Position),
+                        blob.ScaleTo(Vector3.Zero)
+                    )
+                );
+                parentPositions[entityId] = blob.Position;
+                blobPool.ReturnToPool(blob, unparent: false, makeInvisible: false);
             }
-
+        
             dailyAnimations.Add(AnimationUtilities.Series(
                     appearanceAnimations.RunInParallel(),
                     toTreeAnimations.RunInParallel(),
                     toHomeAnimations.RunInParallel()
                 )
             );
+            
+            GD.Print($"Day {dayCount}: " + stopwatch.ElapsedMilliseconds);
+            stopwatch.Restart();
         }
-
+        
         RegisterAnimation(AnimationUtilities.Series(dailyAnimations.ToArray()));
+        GD.Print("Animation registration: " + stopwatch.ElapsedMilliseconds);
+        stopwatch.Restart();
         
         // Go to tree / eat, where only two blobs can be at a tree at a time
         // Go to random home, could be non-random at some point but who cares
@@ -156,6 +190,11 @@ public partial class PlottedSimTest : AnimationSequence
         
         plot.Owner = GetTree().EditedSceneRoot;
         RegisterAnimation(plot.Transition(10));
+        GD.Print("Plot time: " + stopwatch.ElapsedMilliseconds);
+        stopwatch.Restart();
         #endregion
+        
+        
+        RegisterAnimation(ground.AnimateColorHsv(PrimerColor.red));
     }
 }
