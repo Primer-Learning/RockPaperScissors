@@ -1,10 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Godot;
-using Primer;
-using PrimerTools;
+﻿using Godot;
 using PrimerTools.AnimationSequence;
-using PrimerTools.Graph;
 
 [Tool]
 public partial class PlottedSimTest : AnimationSequence
@@ -21,180 +16,31 @@ public partial class PlottedSimTest : AnimationSequence
         sim.InitialBlobCount = 4;
         sim.NumTrees = 20;
         sim.RunSim();
-        var results = sim.GetStrategyFrequenciesByDay();
         
         GD.Print("Sim time: " + stopwatch.ElapsedMilliseconds);
         stopwatch.Restart();
 
         #region Animate the results
 
-        // Make the ground plane
-        var ground = new MeshInstance3D();
-        ground.Name = "Ground";
-        AddChild(ground);
-        ground.Owner = GetTree().EditedSceneRoot;
-        
-        var planeMesh = new PlaneMesh();
-        planeMesh.Size = new Vector2(10, 10);
-        ground.Mesh = planeMesh;
-        // ground.Scale = new Vector3(1, 1, 1);
-        ground.Position = Vector3.Right * 6;
-        var groundMaterial = new StandardMaterial3D();
-        groundMaterial.AlbedoColor = new Color(0x1d6114ff);
-        ground.Mesh.SurfaceSetMaterial(0, groundMaterial);
-        
-        var simVisualizationRng = new Rng(2);
-        // Add trees according to the max number of trees
-        var treeScene = ResourceLoader.Load<PackedScene>("res://addons/PrimerAssets/Organized/Trees/Mango trees/Medium mango tree/Resources/mango tree medium.scn");
-        var trees = new List<Node3D>();
-        for (var i = 0; i < sim.NumTrees; i++)
-        {
-            var tree = treeScene.Instantiate<Node3D>();
-            ground.AddChild(tree);
-            tree.Owner = GetTree().EditedSceneRoot;
-            tree.Name = "Tree";
-            tree.Scale = Vector3.One * 0.1f;
-            tree.Position = new Vector3(simVisualizationRng.RangeFloat(-5, 5), 0, simVisualizationRng.RangeFloat(-5, 5));
-            trees.Add(tree);
-        }
-        GD.Print("Tree and ground time: " + stopwatch.ElapsedMilliseconds);
-        stopwatch.Restart();
-        
-        // Add homes
-        var homeScene = ResourceLoader.Load<PackedScene>("res://addons/PrimerAssets/Organized/Rocks/rock_home_11.tscn");
-        var homes = new List<Node3D>();
-        for (var i = 0; i < 6; i++)
-        {
-            var home = homeScene.Instantiate<Node3D>();
-            ground.AddChild(home);
-            home.Owner = GetTree().EditedSceneRoot;
-            home.Name = "Home";
-            home.Scale = Vector3.One * 0.5f;
-            home.Position = new Vector3(simVisualizationRng.RangeFloat(-5, 5), 0, simVisualizationRng.RangeFloat(-5, 5));
-            homes.Add(home);
-        }
+        var simAnimator = new EvoGameTheorySimAnimator();
+        AddChild(simAnimator);
+        simAnimator.Owner = GetTree().EditedSceneRoot;
+        simAnimator.Sim = sim;
+        simAnimator.NonAnimatedSetup();
         
         // Spawn and move blobs according to the results
-        GD.Print("Homes time: " + stopwatch.ElapsedMilliseconds);
+        GD.Print("Non-animated time: " + stopwatch.ElapsedMilliseconds);
         stopwatch.Restart();
         
-        // Initial blobs spawn in random homes
-        var blobScene = ResourceLoader.Load<PackedScene>("res://addons/PrimerAssets/Organized/Blob/Blobs/blob.tscn");
-        var blobPool = new Pool<Blob>(blobScene);
-        var blobs = new Dictionary<int, Blob>();
-        var parentPositions = new Dictionary<int, Vector3>();
-        // var blobAnimation = new Animation();
-        var dailyAnimations = new List<Animation>();
-        var dayCount = 0;
-        foreach (var entitiesToday in sim.EntitiesByDay)
-        {
-            dayCount++;
-            // TODO: Idea: Make a single loop that processes a whole blob day.
-            // In the old situation, we needed blobs to show up so the sim would know what to do next.
-            // But now all the data is there already, so we could process a whole blob day in one go.
-            // Animation lists for each stage would still need to exist.
-            
-            // Make the blobs
-            var appearanceAnimations = new List<Animation>();
-            foreach (var entityId in entitiesToday)
-            {
-                var blob = blobPool.GetFromPool();
-                blobs.Add(entityId, blob);
-                if (blob.GetParent() == null) ground.AddChild(blob);
-                blob.MakeChildrenLocalRecursively(GetTree().EditedSceneRoot);
-                blob.Owner = GetTree().EditedSceneRoot;
-                blob.Name = "Blob";
-                blob.Scale = Vector3.Zero;
-
-                var parent = sim.Registry.Parents[entityId];
-                var pos = parent == -1 ? homes[simVisualizationRng.RangeInt(homes.Count)].Position : parentPositions[parent];
-                appearanceAnimations.Add(
-                    AnimationUtilities.Parallel(
-                        blob.MoveTo(pos, duration: 0.001f),
-                        blob.ScaleTo(Vector3.One * 0.1f),
-                        blob.AnimateColor(sim.StrategyColors[sim.Registry.Strategies[entityId]])
-                    )
-                );
-            }
-            
-            // Move blobs to trees
-            var numGames = entitiesToday.Count - sim.NumTrees;
-            numGames = Mathf.Max(numGames, 0);
-            numGames = Mathf.Min(numGames, sim.NumTrees);
-            var toTreeAnimations = new List<Animation>();
-            for (var i = 0; i < numGames; i++)
-            {
-                var blob1 = blobs[entitiesToday[i * 2]];
-                var blob2 = blobs[entitiesToday[i * 2 + 1]];
-                
-                toTreeAnimations.Add(blob1.MoveTo(trees[i].Position));
-                toTreeAnimations.Add(blob2.MoveTo(trees[i].Position));
-            }
-            for (var i = numGames * 2; i < entitiesToday.Count; i++)
-            {
-                var blob = blobs[entitiesToday[i]];
-                toTreeAnimations.Add(numGames < sim.NumTrees
-                    ? blob.MoveTo(trees[i - numGames].Position)
-                    : blob.ScaleTo(Vector3.Zero));
-            }
-            
-            // Move the blobs home
-            var toHomeAnimations = new List<Animation>();
-            foreach (var entityId in entitiesToday)
-            {
-                var blob = blobs[entityId];
-                // toHomeAnimations.Add(blob.MoveTo(homes[simVisualizationRng.RangeInt(homes.Count)].Position));
-                toHomeAnimations.Add(
-                    AnimationUtilities.Series(
-                        blob.MoveTo(homes[simVisualizationRng.RangeInt(homes.Count)].Position),
-                        blob.ScaleTo(Vector3.Zero)
-                    )
-                );
-                parentPositions[entityId] = blob.Position;
-                blobPool.ReturnToPool(blob, unparent: false, makeInvisible: false);
-            }
-        
-            dailyAnimations.Add(AnimationUtilities.Series(
-                    appearanceAnimations.RunInParallel(),
-                    toTreeAnimations.RunInParallel(),
-                    toHomeAnimations.RunInParallel()
-                )
-            );
-            
-            GD.Print($"Day {dayCount}: " + stopwatch.ElapsedMilliseconds);
-            stopwatch.Restart();
-        }
-        
-        RegisterAnimation(AnimationUtilities.Series(dailyAnimations.ToArray()));
-        GD.Print("Animation registration: " + stopwatch.ElapsedMilliseconds);
+        RegisterAnimation(simAnimator.AnimateDays());
+        GD.Print("Total animation generation time" + stopwatch.ElapsedMilliseconds);
         stopwatch.Restart();
-        
-        // Go to tree / eat, where only two blobs can be at a tree at a time
-        // Go to random home, could be non-random at some point but who cares
-        // Reproduce by spawning blobs from the next day in the same place as their parents
-
         #endregion
 
         #region Plot the results
-        var ternaryGraph = new TernaryGraph();
-        AddChild(ternaryGraph);
-        ternaryGraph.Owner = GetTree().EditedSceneRoot;
-        ternaryGraph.Scale = Vector3.One * 10;
-        ternaryGraph.Position = Vector3.Left * 11;
-        ternaryGraph.CreateBounds();
-        
-        var plot = new CurvePlot2D();
-        ternaryGraph.AddChild(plot);
-        plot.SetData(results.Select(point => TernaryGraph.CoordinatesToPosition(point.X, point.Y, point.Z)).ToArray());
-        plot.Width = 3;
-        
-        plot.Owner = GetTree().EditedSceneRoot;
-        RegisterAnimation(plot.Transition(10));
+        RegisterAnimation(simAnimator.AnimateTernaryPlot());
         GD.Print("Plot time: " + stopwatch.ElapsedMilliseconds);
         stopwatch.Restart();
         #endregion
-        
-        
-        RegisterAnimation(ground.AnimateColorHsv(PrimerColor.red));
     }
 }
