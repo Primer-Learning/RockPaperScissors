@@ -12,8 +12,8 @@ public partial class PlottedSimTest : AnimationSequence
         // Run the simulation
         var sim = new EvoGameTheorySim();
         AddChild(sim);
-        sim.NumDays = 5;
-        sim.InitialBlobCount = 4;
+        sim.NumDays = 10;
+        sim.InitialBlobCount = 40;
         sim.NumTrees = 20;
         sim.RunSim();
         
@@ -26,6 +26,7 @@ public partial class PlottedSimTest : AnimationSequence
         AddChild(simAnimator);
         simAnimator.Owner = GetTree().EditedSceneRoot;
         simAnimator.Sim = sim;
+        simAnimator.IncludeTernaryPlot = true;
         simAnimator.NonAnimatedSetup();
         
         // Spawn and move blobs according to the results
@@ -38,9 +39,10 @@ public partial class PlottedSimTest : AnimationSequence
         #endregion
 
         #region Plot the results
-        RegisterAnimation(simAnimator.AnimateTernaryPlot());
-        GD.Print("Plot time: " + stopwatch.ElapsedMilliseconds);
-        stopwatch.Restart();
+        // simAnimator.SetUpTernaryPlot();
+        // RegisterAnimation(simAnimator.AnimateTernaryPlotToDay());
+        // GD.Print("Plot time: " + stopwatch.ElapsedMilliseconds);
+        // stopwatch.Restart();
         #endregion
     }
 }

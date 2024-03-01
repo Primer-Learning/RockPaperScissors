@@ -64,7 +64,7 @@ public partial class EvoGameTheorySim : Node
 		
 		private const float GlobalCost = 0.0f;
 		
-		private const float WinMagnitude = 0.2f;
+		private const float WinMagnitude = 0.8f;
 		private const float TieCost = 0.0f;
 		private static readonly float[,] RewardMatrix = new float[3, 3] {
 			{ 1 - TieCost, 1 - WinMagnitude, 1 + 1 * WinMagnitude }, // Rock rewards
@@ -220,11 +220,4 @@ public partial class EvoGameTheorySim : Node
 		}
 		return frequencies;
 	}
-	
-	public Dictionary<RPSGame.Strategy, Color> StrategyColors = new()
-	{
-		{ RPSGame.Strategy.Rock, PrimerColor.red },
-		{ RPSGame.Strategy.Paper, PrimerColor.blue },
-		{ RPSGame.Strategy.Scissors, PrimerColor.green }
-	};
 }

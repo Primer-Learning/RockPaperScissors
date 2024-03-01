@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Godot;
+using Primer;
 using PrimerTools;
 using PrimerTools.Graph;
 
@@ -11,6 +12,15 @@ public partial class EvoGameTheorySimAnimator : Node3D
     private readonly List<Node3D> _trees = new();
     private readonly List<Node3D> _homes = new();
     private readonly Rng _simVisualizationRng = new Rng(2);
+    
+    private readonly Dictionary<EvoGameTheorySim.RPSGame.Strategy, Color> _strategyColors = new()
+    {
+        { EvoGameTheorySim.RPSGame.Strategy.Rock, PrimerColor.red },
+        { EvoGameTheorySim.RPSGame.Strategy.Paper, PrimerColor.blue },
+        { EvoGameTheorySim.RPSGame.Strategy.Scissors, PrimerColor.yellow }
+    };
+    
+    public bool IncludeTernaryPlot = true;
     
     public void NonAnimatedSetup()
     {
@@ -56,6 +66,8 @@ public partial class EvoGameTheorySimAnimator : Node3D
             home.Position = new Vector3(_simVisualizationRng.RangeFloat(-5, 5), 0, _simVisualizationRng.RangeFloat(-5, 5));
             _homes.Add(home);
         }
+        
+        if (IncludeTernaryPlot) SetUpTernaryPlot();
     }
 
     public Animation AnimateDays()
@@ -67,10 +79,9 @@ public partial class EvoGameTheorySimAnimator : Node3D
         var parentPositions = new Dictionary<int, Vector3>();
         var dailyAnimations = new List<Animation>();
         var dayCount = 0;
+        
         foreach (var entitiesToday in Sim.EntitiesByDay)
         {
-            dayCount++;
-            
             // Make the blobs
             var appearanceAnimations = new List<Animation>();
             foreach (var entityId in entitiesToday)
@@ -89,10 +100,16 @@ public partial class EvoGameTheorySimAnimator : Node3D
                     AnimationUtilities.Parallel(
                         blob.MoveTo(pos, duration: 0.001f),
                         blob.ScaleTo(Vector3.One * 0.1f),
-                        blob.AnimateColor(Sim.StrategyColors[Sim.Registry.Strategies[entityId]])
+                        blob.AnimateColor(_strategyColors[Sim.Registry.Strategies[entityId]])
                     )
                 );
             }
+            
+            if (IncludeTernaryPlot)
+            {
+                appearanceAnimations.Add(AnimateTernaryPlotToDay(dayCount));
+            }
+            dayCount++;
             
             // Move blobs to trees
             var numGames = entitiesToday.Count - Sim.NumTrees;
@@ -130,7 +147,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
                 parentPositions[entityId] = blob.Position;
                 blobPool.ReturnToPool(blob, unparent: false, makeInvisible: false);
             }
-        
+            
             dailyAnimations.Add(AnimationUtilities.Series(
                     appearanceAnimations.RunInParallel(),
                     toTreeAnimations.RunInParallel(),
@@ -138,25 +155,43 @@ public partial class EvoGameTheorySimAnimator : Node3D
                 )
             );
         }
+        if (IncludeTernaryPlot)
+        {
+            dailyAnimations.Add(AnimateTernaryPlotToDay(dayCount));
+        }
         
         return AnimationUtilities.Series(dailyAnimations.ToArray());
     }
 
-    public Animation AnimateTernaryPlot()
+    public TernaryGraph ternaryGraph;
+    private CurvePlot2D plot;
+    public void SetUpTernaryPlot()
     {
-        var ternaryGraph = new TernaryGraph();
+        if (ternaryGraph != null) return;
+        ternaryGraph = new TernaryGraph();
         AddChild(ternaryGraph);
         ternaryGraph.Owner = GetTree().EditedSceneRoot;
         ternaryGraph.Scale = Vector3.One * 10;
         ternaryGraph.Position = Vector3.Left * 11;
+        ternaryGraph.Labels = new [] {"Rock", "Paper", "Scissors"};
+        ternaryGraph.Colors = new []
+        {
+            _strategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
+            _strategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+            _strategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
+        };
         ternaryGraph.CreateBounds();
         
-        var plot = new CurvePlot2D();
+        plot = new CurvePlot2D();
         ternaryGraph.AddChild(plot);
-        plot.SetData(Sim.GetStrategyFrequenciesByDay().Select(point => TernaryGraph.CoordinatesToPosition(point.X, point.Y, point.Z)).ToArray());
-        plot.Width = 3;
-        
         plot.Owner = GetTree().EditedSceneRoot;
-        return plot.Transition(10);
+        plot.Width = 3;
+    }
+    public Animation AnimateTernaryPlotToDay(int dayIndex)
+    {
+        plot.SetData(Sim.GetStrategyFrequenciesByDay().Take(dayIndex + 1)
+            .Select(population => TernaryGraph.CoordinatesToPosition(population.X, population.Y, population.Z)).ToArray());
+        
+        return plot.Transition(0.5f);
     }
 }
