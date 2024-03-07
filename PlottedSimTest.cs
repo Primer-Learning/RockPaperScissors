@@ -6,19 +6,22 @@ public partial class PlottedSimTest : AnimationSequence
 {
     protected override void Define()
     {
-        var stopwatch = new System.Diagnostics.Stopwatch();
-        stopwatch.Start();
+        var currentTime = System.Environment.TickCount;
+        // var stopwatch = new System.Diagnostics.Stopwatch();
+        // stopwatch.Start();
         
         // Run the simulation
         var sim = new EvoGameTheorySim();
         AddChild(sim);
-        sim.NumDays = 10;
+        // sim.NumDays = 50; // 43ish seconds
+        sim.NumDays = 20; // 15 ish seconds
+        // sim.NumDays = 100; // Crash
         sim.InitialBlobCount = 40;
         sim.NumTrees = 20;
         sim.RunSim();
         
-        GD.Print("Sim time: " + stopwatch.ElapsedMilliseconds);
-        stopwatch.Restart();
+        // GD.Print("Sim time: " + stopwatch.ElapsedMilliseconds);
+        // stopwatch.Restart();
 
         #region Animate the results
 
@@ -30,13 +33,15 @@ public partial class PlottedSimTest : AnimationSequence
         simAnimator.NonAnimatedSetup();
         
         // Spawn and move blobs according to the results
-        GD.Print("Non-animated time: " + stopwatch.ElapsedMilliseconds);
-        stopwatch.Restart();
+        // GD.Print("Non-animated time: " + stopwatch.ElapsedMilliseconds);
+        // stopwatch.Restart();
         
         RegisterAnimation(simAnimator.AnimateDays());
-        GD.Print("Total animation generation time" + stopwatch.ElapsedMilliseconds);
-        stopwatch.Restart();
+        // GD.Print("Total animation generation time: " + stopwatch.ElapsedMilliseconds);
+        // stopwatch.Restart();
         #endregion
+        
+        // GD.Print("Total time: " + (System.Environment.TickCount - currentTime) + " ms");
 
         #region Plot the results
         // simAnimator.SetUpTernaryPlot();

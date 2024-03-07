@@ -13,6 +13,8 @@ public partial class EvoGameTheorySimAnimator : Node3D
     private readonly List<Node3D> _homes = new();
     private readonly Rng _simVisualizationRng = new Rng(2);
     
+    private float _creatureSpeed = 10f;
+    
     private readonly Dictionary<EvoGameTheorySim.RPSGame.Strategy, Color> _strategyColors = new()
     {
         { EvoGameTheorySim.RPSGame.Strategy.Rock, PrimerColor.red },
@@ -98,7 +100,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
                 var pos = parent == -1 ? _homes[_simVisualizationRng.RangeInt(_homes.Count)].Position : parentPositions[parent];
                 appearanceAnimations.Add(
                     AnimationUtilities.Parallel(
-                        blob.MoveTo(pos, duration: 0.001f),
+                        blob.MoveTo(pos, duration: 0),
                         blob.ScaleTo(Vector3.One * 0.1f),
                         blob.AnimateColor(_strategyColors[Sim.Registry.Strategies[entityId]])
                     )
@@ -121,14 +123,14 @@ public partial class EvoGameTheorySimAnimator : Node3D
                 var blob1 = blobs[entitiesToday[i * 2]];
                 var blob2 = blobs[entitiesToday[i * 2 + 1]];
                 
-                toTreeAnimations.Add(blob1.MoveTo(_trees[i].Position));
-                toTreeAnimations.Add(blob2.MoveTo(_trees[i].Position));
+                toTreeAnimations.Add(AnimateBlobMovementWithSpeed(blob1, _trees[i].Position));
+                toTreeAnimations.Add(AnimateBlobMovementWithSpeed(blob2, _trees[i].Position));
             }
             for (var i = numGames * 2; i < entitiesToday.Count; i++)
             {
                 var blob = blobs[entitiesToday[i]];
                 toTreeAnimations.Add(numGames < Sim.NumTrees
-                    ? blob.MoveTo(_trees[i - numGames].Position)
+                    ? AnimateBlobMovementWithSpeed(blob, _trees[i - numGames].Position)
                     : blob.ScaleTo(Vector3.Zero));
             }
             
@@ -137,10 +139,9 @@ public partial class EvoGameTheorySimAnimator : Node3D
             foreach (var entityId in entitiesToday)
             {
                 var blob = blobs[entityId];
-                // toHomeAnimations.Add(blob.MoveTo(homes[simVisualizationRng.RangeInt(homes.Count)].Position));
                 toHomeAnimations.Add(
                     AnimationUtilities.Series(
-                        blob.MoveTo(_homes[_simVisualizationRng.RangeInt(_homes.Count)].Position),
+                        AnimateBlobMovementWithSpeed(blob, _homes[_simVisualizationRng.RangeInt(_homes.Count)].Position),
                         blob.ScaleTo(Vector3.Zero)
                     )
                 );
@@ -163,6 +164,12 @@ public partial class EvoGameTheorySimAnimator : Node3D
         return AnimationUtilities.Series(dailyAnimations.ToArray());
     }
 
+    private Animation AnimateBlobMovementWithSpeed(Blob blob, Vector3 destination)
+    {
+        var distance = (blob.Position - destination).Length();
+        return blob.MoveTo(destination, duration: distance / _creatureSpeed);
+    }
+    
     public TernaryGraph ternaryGraph;
     private CurvePlot2D plot;
     public void SetUpTernaryPlot()

@@ -64,8 +64,8 @@ public partial class EvoGameTheorySim : Node
 		
 		private const float GlobalCost = 0.0f;
 		
-		private const float WinMagnitude = 0.8f;
-		private const float TieCost = 0.0f;
+		private const float WinMagnitude = 0.5f;
+		private const float TieCost = 0.2f;
 		private static readonly float[,] RewardMatrix = new float[3, 3] {
 			{ 1 - TieCost, 1 - WinMagnitude, 1 + 1 * WinMagnitude }, // Rock rewards
 			{ 1 + WinMagnitude, 1 - TieCost, 1 - WinMagnitude }, // Paper rewards   
