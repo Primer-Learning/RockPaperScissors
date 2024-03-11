@@ -52,7 +52,6 @@ public partial class IntroSequence : AnimationSequence
 				scissorsBlob1.WalkTo(new Vector3(-1, 0, 2))
 			)
 		);
-
 		RegisterAnimation(
 			AnimationUtilities.Parallel(
 				paperBlob1.RotateTo(new Vector3(0, -80, 0)),
@@ -60,6 +59,6 @@ public partial class IntroSequence : AnimationSequence
 			)
 		);
 		
-		RegisterAnimation(scissorsBlob1.EvilPose());
+		RegisterAnimation(scissorsBlob1.SetUpPredefinedAnimation("evil_pose"));
 	}
 }
