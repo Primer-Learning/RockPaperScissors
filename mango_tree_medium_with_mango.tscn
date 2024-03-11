@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://ddqhwku0yk3aq"]
+
+[ext_resource type="PackedScene" uid="uid://dpak6w133vjho" path="res://addons/PrimerAssets/Organized/Trees/Mango trees/Medium mango tree/mango tree medium.blend" id="1_cwunj"]
+
+[node name="mango tree medium" instance=ExtResource("1_cwunj")]
