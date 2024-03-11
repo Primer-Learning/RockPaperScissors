@@ -75,8 +75,8 @@ public partial class EvoGameTheorySimAnimator : Node3D
     public Animation AnimateDays()
     {
         // Initial blobs spawn in random homes
-        var blobScene = ResourceLoader.Load<PackedScene>("res://addons/PrimerAssets/Organized/Blob/Blobs/blob.tscn");
-        var blobPool = new Pool<Blob>(blobScene);
+        // var blobScene = ResourceLoader.Load<PackedScene>("res://addons/PrimerAssets/Organized/Blob/Blobs/blob.tscn");
+        var blobPool = new Pool<Blob>(Blob.BlobScene);
         var blobs = new Dictionary<int, Blob>();
         var parentPositions = new Dictionary<int, Vector3>();
         var dailyAnimations = new List<Animation>();
@@ -91,7 +91,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
                 var blob = blobPool.GetFromPool();
                 blobs.Add(entityId, blob);
                 if (blob.GetParent() == null) _ground.AddChild(blob);
-                blob.MakeChildrenLocalRecursively(GetTree().EditedSceneRoot);
+                blob.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
                 blob.Owner = GetTree().EditedSceneRoot;
                 blob.Name = "Blob";
                 blob.Scale = Vector3.Zero;
