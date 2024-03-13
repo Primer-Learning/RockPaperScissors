@@ -48,8 +48,8 @@ public partial class IntroSequence : AnimationSequence
 		);
 		RegisterAnimation(
 			AnimationUtilities.Parallel(
-				paperBlob1.WalkTo(new Vector3(1, 0, 2)),
-				scissorsBlob1.WalkTo(new Vector3(-1, 0, 2))
+				paperBlob1.WalkTo(new Vector3(2, 0, 2)),
+				scissorsBlob1.WalkTo(new Vector3(-2, 0, 2))
 			)
 		);
 		RegisterAnimation(
@@ -59,6 +59,8 @@ public partial class IntroSequence : AnimationSequence
 			)
 		);
 		
-		RegisterAnimation(scissorsBlob1.SetUpPredefinedAnimation("evil_pose"));
+		// RegisterAnimation(scissorsBlob1.SetUpPredefinedAnimation("cast_spell"));
+		// RegisterAnimation(scissorsBlob1.ScissorsSnip());
+		RegisterAnimation(scissorsBlob1.ScissorsPaperShowdown(paperBlob1, true));
 	}
 }
