@@ -15,7 +15,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
     
     private float _creatureSpeed = 10f;
     
-    private readonly Dictionary<EvoGameTheorySim.RPSGame.Strategy, Color> _strategyColors = new()
+    public static readonly Dictionary<EvoGameTheorySim.RPSGame.Strategy, Color> StrategyColors = new()
     {
         { EvoGameTheorySim.RPSGame.Strategy.Rock, PrimerColor.red },
         { EvoGameTheorySim.RPSGame.Strategy.Paper, PrimerColor.blue },
@@ -102,7 +102,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
                     AnimationUtilities.Parallel(
                         blob.MoveTo(pos, duration: 0),
                         blob.ScaleTo(Vector3.One * 0.1f),
-                        blob.AnimateColor(_strategyColors[Sim.Registry.Strategies[entityId]])
+                        blob.AnimateColor(StrategyColors[Sim.Registry.Strategies[entityId]])
                     )
                 );
             }
@@ -183,9 +183,9 @@ public partial class EvoGameTheorySimAnimator : Node3D
         ternaryGraph.Labels = new [] {"Rock", "Paper", "Scissors"};
         ternaryGraph.Colors = new []
         {
-            _strategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
-            _strategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
-            _strategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
+            StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
+            StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+            StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
         };
         ternaryGraph.CreateBounds();
         
