@@ -15,6 +15,26 @@ public partial class IntroSequence : AnimationSequence
 		camRig.Position = Vector3.Up * 2;
 		camRig.RotationDegrees = new Vector3(-17, 0, 0);
 
+		// Ground
+		var ground = new MeshInstance3D();
+		ground.Name = "ground";
+		AddChild(ground);
+		var groundMesh = new PlaneMesh();
+		ground.Mesh = groundMesh;
+		var groundMaterial = new StandardMaterial3D();
+		groundMaterial.AlbedoColor = new Color(0, 0, 0, 0);
+		groundMaterial.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+		groundMesh.Material = groundMaterial;
+		groundMesh.Size = new Vector2(100, 100);
+		var groundStaticBody = new StaticBody3D();
+		var groundCollisionShape3D = new CollisionShape3D();
+		var groundCollisionShape = new WorldBoundaryShape3D();
+		groundCollisionShape.Plane = new Plane(0, 1, 0, 0);
+		groundStaticBody.AddChild(groundCollisionShape3D);
+		groundCollisionShape3D.Shape = groundCollisionShape;
+		ground.AddChild(groundStaticBody);
+		ground.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+
 		#region First tree
 		var tree1 = FruitTree.TreeScene.Instantiate<FruitTree>();
 		tree1.rng = rng;
@@ -64,18 +84,21 @@ public partial class IntroSequence : AnimationSequence
 			)
 		);
 		
-		RegisterAnimation(scissorsBlob1.ScissorsPaperShowdown(paperBlob1, true));
+		RegisterAnimation(scissorsBlob1.ScissorsPaperShowdown(paperBlob1));
+		// RegisterAnimation(scissorsBlob1.Eat(tree1.FindNearestFruit(scissorsBlob1)));
+		// RegisterAnimation(scissorsBlob1.Eat(tree1.FindNearestFruit(scissorsBlob1)));
 		#endregion
 		
 		RegisterAnimation(
 			AnimationUtilities.Parallel(
+				// Actual intended movement
 				camRig.MoveTo(new Vector3(4.5f, 2, 0)),
 				camRig.ZoomTo(22)
 			)
 		);
-
+		
 		#region Second tree
-
+		
 		var tree2 = FruitTree.TreeScene.Instantiate<FruitTree>();
 		tree2.rng = rng;
 		AddChild(tree2);
@@ -105,7 +128,7 @@ public partial class IntroSequence : AnimationSequence
 		rockBlob2.Scale = Vector3.Zero;
 		rockBlob2.Position = tree2.Position + new Vector3(-3, 0, 0);
 		rockBlob2.SetColor(PrimerColor.red);
-
+		
 		RegisterAnimation(
 			AnimationUtilities.Parallel(
 				rockBlob1.ScaleTo(1),
@@ -125,7 +148,7 @@ public partial class IntroSequence : AnimationSequence
 			)
 		);
 		
-		RegisterAnimation(rockBlob2.ScissorsPaperShowdown(rockBlob1, true));
+		// RegisterAnimation(rockBlob2.PaperPaperShowdown(rockBlob1));
 
 		#endregion
 	}
