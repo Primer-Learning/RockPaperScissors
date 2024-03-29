@@ -35,6 +35,7 @@ public class ExampleConflictTree
 		this.strategy2 = strategy2;
 		
 		Tree = FruitTree.TreeScene.Instantiate<FruitTree>();
+		Tree.Name = "Tree";
 		Tree.rng = rng;
 		parent.AddChild(Tree);
 		Tree.Owner = parent.GetTree().EditedSceneRoot;
@@ -53,6 +54,7 @@ public class ExampleConflictTree
 	private Blob CreateBlob(EvoGameTheorySim.RPSGame.Strategy strategy)
 	{
 		var blob = Blob.BlobScene.Instantiate<Blob>();
+		blob.Name = strategy + " Blob";
 		blob.SetColor(EvoGameTheorySimAnimator.StrategyColors[strategy]);
 		parent.AddChild(blob);
 		blob.MakeSelfAndChildrenLocal(parent.GetTree().EditedSceneRoot);
@@ -72,15 +74,17 @@ public class ExampleConflictTree
 	
 	public Animation BlobsAppear()
 	{
-		return AnimationUtilities.Series(
-			AnimationUtilities.Parallel(
-				Blob1.ScaleTo(1),
-				Blob2.ScaleTo(1)
-			),
-			AnimationUtilities.Parallel(
-				Blob1.RotateTo(new Vector3(0, 80, 0)),
-				Blob2.RotateTo(new Vector3(0, -80, 0))
-			)
+		return AnimationUtilities.Parallel(
+			Blob1.ScaleTo(1),
+			Blob2.ScaleTo(1)
+		);
+	}
+
+	public Animation BlobsFaceEachOther()
+	{
+		return AnimationUtilities.Parallel(
+			Blob1.RotateTo(new Vector3(0, 80, 0)),
+			Blob2.RotateTo(new Vector3(0, -80, 0))
 		);
 	}
 

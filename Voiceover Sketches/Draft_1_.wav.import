@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://d0qieuqkkhktt"
+path="res://.godot/imported/Draft_1_.wav-ebce7351c4810ea75148e89c13be1b2b.sample"
+
+[deps]
+
+source_file="res://Voiceover Sketches/Draft_1_.wav"
+dest_files=["res://.godot/imported/Draft_1_.wav-ebce7351c4810ea75148e89c13be1b2b.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0
