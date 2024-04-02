@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://1ghlwybfm3ih"
+path="res://.godot/imported/Draft_but_actually_another_outline.wav-f2fe414a9b37cae397d94d2c40b0fde8.sample"
+
+[deps]
+
+source_file="res://Voiceover Sketches/Draft_but_actually_another_outline.wav"
+dest_files=["res://.godot/imported/Draft_but_actually_another_outline.wav-f2fe414a9b37cae397d94d2c40b0fde8.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0
