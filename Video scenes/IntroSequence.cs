@@ -35,7 +35,7 @@ public partial class IntroSequence : AnimationSequence
 		groundStaticBody.AddChild(groundCollisionShape3D);
 		groundCollisionShape3D.Shape = groundCollisionShape;
 		ground.AddChild(groundStaticBody);
-		ground.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+		ground.Owner = GetTree().EditedSceneRoot;
 
 
 		var conflictSite1 = new ExampleConflictTree(
@@ -63,31 +63,67 @@ public partial class IntroSequence : AnimationSequence
 		rockText.Name = "RockText";
 		rockText.latex = "Rock";
 		rockText.HorizontalAlignment = LatexNode.HorizontalAlignmentOptions.Center;
+		rockText.VerticalAlignment = LatexNode.VerticalAlignmentOptions.Center;
 		rockText.UpdateCharacters();
-		rockText.Position = new Vector3(9, 11.5f, 0);
+		rockText.Position = new Vector3(9, 12.5f, 0);
 		rockText.Scale = Vector3.Zero;
 		AddChild(rockText);
-		rockText.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+		rockText.Owner = GetTree().EditedSceneRoot;
 		
 		var scissorsText = new LatexNode();
 		scissorsText.Name = "ScissorsText";
 		scissorsText.latex = "Scissors";
 		scissorsText.HorizontalAlignment = LatexNode.HorizontalAlignmentOptions.Center;
+		scissorsText.VerticalAlignment = LatexNode.VerticalAlignmentOptions.Center;
 		scissorsText.UpdateCharacters();
 		scissorsText.Position = new Vector3(13.5f, 6.5f, 0);
 		scissorsText.Scale = Vector3.Zero;
 		AddChild(scissorsText);
-		scissorsText.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+		scissorsText.Owner = GetTree().EditedSceneRoot;
 		
 		var paperText = new LatexNode();
 		paperText.Name = "PaperText";
 		paperText.latex = "Paper";
 		paperText.HorizontalAlignment = LatexNode.HorizontalAlignmentOptions.Center;
+		paperText.VerticalAlignment = LatexNode.VerticalAlignmentOptions.Center;
 		paperText.UpdateCharacters();
 		paperText.Position = new Vector3(4.5f, 6.5f, 0);
 		paperText.Scale = Vector3.Zero;
 		AddChild(paperText);
-		paperText.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+		paperText.Owner = GetTree().EditedSceneRoot;
+		
+		var arrow1 = Arrow.ArrowScene.Instantiate<Arrow>();
+		AddChild(arrow1);
+		arrow1.Owner = GetTree().EditedSceneRoot;
+		arrow1.nodeThatTailFollows = rockText;
+		arrow1.nodeThatHeadFollows = scissorsText;
+		arrow1.width = 3;
+		arrow1.headPadding = 1f;
+		arrow1.tailPadding = 1.5f;
+		arrow1.Update();
+		arrow1.Scale = Vector3.Zero;
+		
+		var arrow2 = Arrow.ArrowScene.Instantiate<Arrow>();
+		AddChild(arrow2);
+		arrow2.Owner = GetTree().EditedSceneRoot;
+		arrow2.nodeThatTailFollows = scissorsText;
+		arrow2.nodeThatHeadFollows = paperText;
+		arrow2.width = 3;
+		arrow2.headPadding = 2;
+		arrow2.tailPadding = 2.5f;
+		arrow2.Update();
+		arrow2.Scale = Vector3.Zero;
+		
+		var arrow3 = Arrow.ArrowScene.Instantiate<Arrow>();
+		AddChild(arrow3);
+		arrow3.Owner = GetTree().EditedSceneRoot;
+		arrow3.nodeThatTailFollows = paperText;
+		arrow3.nodeThatHeadFollows = rockText;
+		arrow3.width = 3;
+		arrow3.headPadding = 1.5f;
+		arrow3.tailPadding = 1f;
+		arrow3.Update();
+		arrow3.Scale = Vector3.Zero;
 		
 		#endregion
 		
@@ -125,6 +161,9 @@ public partial class IntroSequence : AnimationSequence
 				rockText.ScaleTo(0.75f),
 				scissorsText.ScaleTo(0.75f),
 				paperText.ScaleTo(0.75f),
+				arrow1.ScaleUpFromTail(),
+				arrow2.ScaleUpFromTail().WithDelay(1.5f),
+				arrow3.ScaleUpFromTail().WithDelay(3f),
 				
 				AnimationUtilities.Series(
 					conflictSite2.BlobsFaceEachOther(),
@@ -138,6 +177,9 @@ public partial class IntroSequence : AnimationSequence
 			),
 			6.5f
 		);
+
+		
+		
 
 		RegisterAnimation(
 			AnimationUtilities.Parallel(
