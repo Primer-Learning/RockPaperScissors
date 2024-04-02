@@ -59,16 +59,27 @@ public partial class IntroSequence : AnimationSequence
 			EvoGameTheorySim.RPSGame.Strategy.Rock,
 			rng
 		);
+		
+		#region Triangle diagram
+
+		var triangleDiagram = new Node3D();
+		triangleDiagram.Position = new Vector3(9, 9, 0);
+		AddChild(triangleDiagram);
+		triangleDiagram.Owner = GetTree().EditedSceneRoot;
+		triangleDiagram.Name = "TriangleDiagram";
+		
 		var rockText = new LatexNode();
 		rockText.Name = "RockText";
 		rockText.latex = "Rock";
 		rockText.HorizontalAlignment = LatexNode.HorizontalAlignmentOptions.Center;
 		rockText.VerticalAlignment = LatexNode.VerticalAlignmentOptions.Center;
 		rockText.UpdateCharacters();
-		rockText.Position = new Vector3(9, 12.5f, 0);
+		rockText.SetColor(EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock]);
+		triangleDiagram.AddChild(rockText);
+		rockText.GlobalPosition = new Vector3(9, 12.5f, 0);
 		rockText.Scale = Vector3.Zero;
-		AddChild(rockText);
-		rockText.Owner = GetTree().EditedSceneRoot;
+		rockText.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+		// rockText.Owner = GetTree().EditedSceneRoot;
 		
 		var scissorsText = new LatexNode();
 		scissorsText.Name = "ScissorsText";
@@ -76,9 +87,10 @@ public partial class IntroSequence : AnimationSequence
 		scissorsText.HorizontalAlignment = LatexNode.HorizontalAlignmentOptions.Center;
 		scissorsText.VerticalAlignment = LatexNode.VerticalAlignmentOptions.Center;
 		scissorsText.UpdateCharacters();
-		scissorsText.Position = new Vector3(13.5f, 6.5f, 0);
+		scissorsText.SetColor(EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]);
+		triangleDiagram.AddChild(scissorsText);
+		scissorsText.GlobalPosition = new Vector3(13.5f, 6.5f, 0);
 		scissorsText.Scale = Vector3.Zero;
-		AddChild(scissorsText);
 		scissorsText.Owner = GetTree().EditedSceneRoot;
 		
 		var paperText = new LatexNode();
@@ -87,13 +99,47 @@ public partial class IntroSequence : AnimationSequence
 		paperText.HorizontalAlignment = LatexNode.HorizontalAlignmentOptions.Center;
 		paperText.VerticalAlignment = LatexNode.VerticalAlignmentOptions.Center;
 		paperText.UpdateCharacters();
-		paperText.Position = new Vector3(4.5f, 6.5f, 0);
+		paperText.SetColor(EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper]);
+		triangleDiagram.AddChild(paperText);
+		paperText.GlobalPosition = new Vector3(4.5f, 6.5f, 0);
 		paperText.Scale = Vector3.Zero;
-		AddChild(paperText);
 		paperText.Owner = GetTree().EditedSceneRoot;
 		
+		var rockBeatsScissors = new LatexNode();
+		rockBeatsScissors.Name = "rockBeatsScissors";
+		rockBeatsScissors.latex = "Beats";
+		rockBeatsScissors.HorizontalAlignment = LatexNode.HorizontalAlignmentOptions.Center;
+		rockBeatsScissors.VerticalAlignment = LatexNode.VerticalAlignmentOptions.Center;
+		rockBeatsScissors.UpdateCharacters();
+		triangleDiagram.AddChild(rockBeatsScissors);
+		rockBeatsScissors.GlobalPosition = new Vector3(12.9f, 10.4f, 0);
+		rockBeatsScissors.Scale = Vector3.Zero;
+		rockBeatsScissors.Owner = GetTree().EditedSceneRoot;
+		
+		var scissorsBeatsPaper = new LatexNode();
+		scissorsBeatsPaper.Name = "scissorsBeatsPaper";
+		scissorsBeatsPaper.latex = "Beats";
+		scissorsBeatsPaper.HorizontalAlignment = LatexNode.HorizontalAlignmentOptions.Center;
+		scissorsBeatsPaper.VerticalAlignment = LatexNode.VerticalAlignmentOptions.Center;
+		scissorsBeatsPaper.UpdateCharacters();
+		triangleDiagram.AddChild(scissorsBeatsPaper);
+		scissorsBeatsPaper.GlobalPosition = new Vector3(9f, 5.5f, 0);
+		scissorsBeatsPaper.Scale = Vector3.Zero;
+		scissorsBeatsPaper.Owner = GetTree().EditedSceneRoot;
+		
+		var paperBeatsRock = new LatexNode();
+		paperBeatsRock.Name = "paperBeatsRock";
+		paperBeatsRock.latex = "Beats";
+		paperBeatsRock.HorizontalAlignment = LatexNode.HorizontalAlignmentOptions.Center;
+		paperBeatsRock.VerticalAlignment = LatexNode.VerticalAlignmentOptions.Center;
+		paperBeatsRock.UpdateCharacters();
+		triangleDiagram.AddChild(paperBeatsRock);
+		paperBeatsRock.GlobalPosition = new Vector3(5.1f, 10.4f, 0);
+		paperBeatsRock.Scale = Vector3.Zero;
+		paperBeatsRock.Owner = GetTree().EditedSceneRoot;
+		
 		var arrow1 = Arrow.ArrowScene.Instantiate<Arrow>();
-		AddChild(arrow1);
+		triangleDiagram.AddChild(arrow1);
 		arrow1.Owner = GetTree().EditedSceneRoot;
 		arrow1.nodeThatTailFollows = rockText;
 		arrow1.nodeThatHeadFollows = scissorsText;
@@ -104,7 +150,7 @@ public partial class IntroSequence : AnimationSequence
 		arrow1.Scale = Vector3.Zero;
 		
 		var arrow2 = Arrow.ArrowScene.Instantiate<Arrow>();
-		AddChild(arrow2);
+		triangleDiagram.AddChild(arrow2);
 		arrow2.Owner = GetTree().EditedSceneRoot;
 		arrow2.nodeThatTailFollows = scissorsText;
 		arrow2.nodeThatHeadFollows = paperText;
@@ -115,7 +161,7 @@ public partial class IntroSequence : AnimationSequence
 		arrow2.Scale = Vector3.Zero;
 		
 		var arrow3 = Arrow.ArrowScene.Instantiate<Arrow>();
-		AddChild(arrow3);
+		triangleDiagram.AddChild(arrow3);
 		arrow3.Owner = GetTree().EditedSceneRoot;
 		arrow3.nodeThatTailFollows = paperText;
 		arrow3.nodeThatHeadFollows = rockText;
@@ -124,6 +170,7 @@ public partial class IntroSequence : AnimationSequence
 		arrow3.tailPadding = 1f;
 		arrow3.Update();
 		arrow3.Scale = Vector3.Zero;
+		#endregion
 		
 		#endregion
 		
@@ -162,8 +209,13 @@ public partial class IntroSequence : AnimationSequence
 				scissorsText.ScaleTo(0.75f),
 				paperText.ScaleTo(0.75f),
 				arrow1.ScaleUpFromTail(),
+				rockBeatsScissors.ScaleTo(0.5f),
+				
 				arrow2.ScaleUpFromTail().WithDelay(1.5f),
+				scissorsBeatsPaper.ScaleTo(0.5f).WithDelay(1.5f),
+				
 				arrow3.ScaleUpFromTail().WithDelay(3f),
+				paperBeatsRock.ScaleTo(0.5f).WithDelay(3f),
 				
 				AnimationUtilities.Series(
 					conflictSite2.BlobsFaceEachOther(),
@@ -177,10 +229,7 @@ public partial class IntroSequence : AnimationSequence
 			),
 			6.5f
 		);
-
 		
-		
-
 		RegisterAnimation(
 			AnimationUtilities.Parallel(
 				conflictSite1.EatFruit(),
@@ -190,6 +239,35 @@ public partial class IntroSequence : AnimationSequence
 			17
 		);
 		
+		RegisterAnimation(triangleDiagram.MoveTo(new Vector3(2, 9, 0)), 27);
+		
+		var table = new Table();
+		AddChild(table);
+		table.Name = "Reward matrix";
+		table.Position = new Vector3(10.85f, 11.5f, 0);
+		table.Scale = Vector3.One * 0.85f;
+		
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable(@"\begin{center} Mango \\ Rewards \end{center}", 0, 0);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("vs Rock", 0, 1);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("vs Paper", 0, 2);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("vs Scissors", 0, 3);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("Rock", 1, 0);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("Paper", 2, 0);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("Scissors", 3, 0);
+		// Rewards
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("1", 1, 1);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("0", 1, 2);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("2", 1, 3);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("2", 2, 1);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("1", 2, 2);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("0", 2, 3);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("0", 3, 1);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("2", 3, 2);
+		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("1", 3, 3);
+		table.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+		
+		table.SetScaleOfAllChildren(Vector3.Zero);
+		RegisterAnimation(table.ScaleAllChildrenToDefault());
 		
 		RegisterAnimation( new Animation(), 1000);
 		
