@@ -38,8 +38,7 @@ public class ExampleConflictTree
 		Tree.rng = rng;
 		parent.AddChild(Tree);
 		Tree.Name = "Tree";
-		Tree.Owner = parent.GetTree().EditedSceneRoot;
-		Tree.Owner = parent.GetTree().EditedSceneRoot;
+		// Tree.Owner = parent.GetTree().EditedSceneRoot;
 		Tree.Position = position;
 		Tree.Scale = Vector3.Zero;
 
@@ -57,7 +56,7 @@ public class ExampleConflictTree
 		blob.SetColor(EvoGameTheorySimAnimator.StrategyColors[strategy]);
 		parent.AddChild(blob);
 		blob.Name = strategy + " Blob";
-		blob.Owner = parent.GetTree().EditedSceneRoot;
+		// blob.Owner = parent.GetTree().EditedSceneRoot;
 		return blob;
 	}
 

@@ -23,3 +23,7 @@ window/size/always_on_top=true
 [dotnet]
 
 project/assembly_name="Rock Paper Scissors"
+
+[editor]
+
+movie_writer/movie_file="C:/Users/justin/Synced Project Files/Primer repos/Godot/projects/RockPaperScissors_video_project/png/test_scene.png"

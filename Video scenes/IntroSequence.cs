@@ -35,7 +35,7 @@ public partial class IntroSequence : AnimationSequence
 		groundStaticBody.AddChild(groundCollisionShape3D);
 		groundCollisionShape3D.Shape = groundCollisionShape;
 		ground.AddChild(groundStaticBody);
-		ground.Owner = GetTree().EditedSceneRoot;
+		// // ground.Owner = GetTree().EditedSceneRoot;
 
 
 		var conflictSite1 = new ExampleConflictTree(
@@ -65,7 +65,7 @@ public partial class IntroSequence : AnimationSequence
 		var triangleDiagram = new Node3D();
 		triangleDiagram.Position = new Vector3(9, 9, 0);
 		AddChild(triangleDiagram);
-		triangleDiagram.Owner = GetTree().EditedSceneRoot;
+		// triangleDiagram.Owner = GetTree().EditedSceneRoot;
 		triangleDiagram.Name = "TriangleDiagram";
 		
 		var rockText = new LatexNode();
@@ -78,8 +78,8 @@ public partial class IntroSequence : AnimationSequence
 		triangleDiagram.AddChild(rockText);
 		rockText.GlobalPosition = new Vector3(9, 12.5f, 0);
 		rockText.Scale = Vector3.Zero;
-		rockText.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
-		// rockText.Owner = GetTree().EditedSceneRoot;
+		// rockText.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+		// // rockText.Owner = GetTree().EditedSceneRoot;
 		
 		var scissorsText = new LatexNode();
 		scissorsText.Name = "ScissorsText";
@@ -91,7 +91,7 @@ public partial class IntroSequence : AnimationSequence
 		triangleDiagram.AddChild(scissorsText);
 		scissorsText.GlobalPosition = new Vector3(13.5f, 6.5f, 0);
 		scissorsText.Scale = Vector3.Zero;
-		scissorsText.Owner = GetTree().EditedSceneRoot;
+		// scissorsText.Owner = GetTree().EditedSceneRoot;
 		
 		var paperText = new LatexNode();
 		paperText.Name = "PaperText";
@@ -103,7 +103,7 @@ public partial class IntroSequence : AnimationSequence
 		triangleDiagram.AddChild(paperText);
 		paperText.GlobalPosition = new Vector3(4.5f, 6.5f, 0);
 		paperText.Scale = Vector3.Zero;
-		paperText.Owner = GetTree().EditedSceneRoot;
+		// paperText.Owner = GetTree().EditedSceneRoot;
 		
 		var rockBeatsScissors = new LatexNode();
 		rockBeatsScissors.Name = "rockBeatsScissors";
@@ -114,7 +114,7 @@ public partial class IntroSequence : AnimationSequence
 		triangleDiagram.AddChild(rockBeatsScissors);
 		rockBeatsScissors.GlobalPosition = new Vector3(12.9f, 10.4f, 0);
 		rockBeatsScissors.Scale = Vector3.Zero;
-		rockBeatsScissors.Owner = GetTree().EditedSceneRoot;
+		// rockBeatsScissors.Owner = GetTree().EditedSceneRoot;
 		
 		var scissorsBeatsPaper = new LatexNode();
 		scissorsBeatsPaper.Name = "scissorsBeatsPaper";
@@ -125,7 +125,7 @@ public partial class IntroSequence : AnimationSequence
 		triangleDiagram.AddChild(scissorsBeatsPaper);
 		scissorsBeatsPaper.GlobalPosition = new Vector3(9f, 5.5f, 0);
 		scissorsBeatsPaper.Scale = Vector3.Zero;
-		scissorsBeatsPaper.Owner = GetTree().EditedSceneRoot;
+		// scissorsBeatsPaper.Owner = GetTree().EditedSceneRoot;
 		
 		var paperBeatsRock = new LatexNode();
 		paperBeatsRock.Name = "paperBeatsRock";
@@ -136,11 +136,11 @@ public partial class IntroSequence : AnimationSequence
 		triangleDiagram.AddChild(paperBeatsRock);
 		paperBeatsRock.GlobalPosition = new Vector3(5.1f, 10.4f, 0);
 		paperBeatsRock.Scale = Vector3.Zero;
-		paperBeatsRock.Owner = GetTree().EditedSceneRoot;
+		// paperBeatsRock.Owner = GetTree().EditedSceneRoot;
 		
 		var arrow1 = Arrow.ArrowScene.Instantiate<Arrow>();
 		triangleDiagram.AddChild(arrow1);
-		arrow1.Owner = GetTree().EditedSceneRoot;
+		// arrow1.Owner = GetTree().EditedSceneRoot;
 		arrow1.nodeThatTailFollows = rockText;
 		arrow1.nodeThatHeadFollows = scissorsText;
 		arrow1.width = 3;
@@ -151,7 +151,7 @@ public partial class IntroSequence : AnimationSequence
 		
 		var arrow2 = Arrow.ArrowScene.Instantiate<Arrow>();
 		triangleDiagram.AddChild(arrow2);
-		arrow2.Owner = GetTree().EditedSceneRoot;
+		// arrow2.Owner = GetTree().EditedSceneRoot;
 		arrow2.nodeThatTailFollows = scissorsText;
 		arrow2.nodeThatHeadFollows = paperText;
 		arrow2.width = 3;
@@ -162,7 +162,7 @@ public partial class IntroSequence : AnimationSequence
 		
 		var arrow3 = Arrow.ArrowScene.Instantiate<Arrow>();
 		triangleDiagram.AddChild(arrow3);
-		arrow3.Owner = GetTree().EditedSceneRoot;
+		// arrow3.Owner = GetTree().EditedSceneRoot;
 		arrow3.nodeThatTailFollows = paperText;
 		arrow3.nodeThatHeadFollows = rockText;
 		arrow3.width = 3;
@@ -230,16 +230,7 @@ public partial class IntroSequence : AnimationSequence
 			6.5f
 		);
 		
-		RegisterAnimation(
-			AnimationUtilities.Parallel(
-				conflictSite1.EatFruit(),
-				conflictSite2.EatFruit().WithDelay(0.1f),
-				conflictSite3.EatFruit().WithDelay(0.2f)
-			),
-			17
-		);
-		
-		RegisterAnimation(triangleDiagram.MoveTo(new Vector3(2, 9, 0)), 27);
+		RegisterAnimation(triangleDiagram.MoveTo(new Vector3(2, 9, 0)), 13);
 		
 		var table = new Table();
 		AddChild(table);
@@ -264,77 +255,102 @@ public partial class IntroSequence : AnimationSequence
 		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("0", 3, 1);
 		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("2", 3, 2);
 		table.AddLatexNodeToPositionWithDefaultSettingsForTheTable("1", 3, 3);
-		table.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
-		
+		// table.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
 		table.SetScaleOfAllChildren(Vector3.Zero);
-		RegisterAnimation(table.ScaleAllChildrenToDefault());
-		
-		RegisterAnimation( new Animation(), 1000);
-		
-		
-		
-		
-		
+
+		RegisterAnimation(
+			table.ScaleCellToDefault(0, 0),
+			table.ScaleCellToDefault(1, 0).WithDelay(0.1f),
+			table.ScaleCellToDefault(0, 1).WithDelay(0.1f),
+			table.ScaleCellToDefault(2, 0).WithDelay(0.2f),
+			table.ScaleCellToDefault(0, 2).WithDelay(0.2f),
+			table.ScaleCellToDefault(3, 0).WithDelay(0.3f),
+			table.ScaleCellToDefault(0, 3).WithDelay(0.3f)
+		);
 		
 		RegisterAnimation(
 			AnimationUtilities.Parallel(
-				// Actual intended movement
-				camRig.MoveTo(new Vector3(9f, 2, 0)),
-				camRig.ZoomTo(30)
-			)
+				table.ScaleCellToDefault(3, 1),
+				table.ScaleCellToDefault(1, 3),
+				conflictSite1.EatFruit()
+			),
+			26
 		);
-		
-		
-		
-		#endregion
-		
-		#region Up to six trees
-		
 		RegisterAnimation(
 			AnimationUtilities.Parallel(
-				// Actual intended movement
-				camRig.MoveTo(new Vector3(9f, 0, 0)),
-				camRig.ZoomTo(30)
+				table.ScaleCellToDefault(3, 2),
+				table.ScaleCellToDefault(2, 3),
+				conflictSite2.EatFruit()
 			)
 		);
-		
-		var conflictSite4 = new ExampleConflictTree(
-			this,
-			position: Vector3.Zero + Vector3.Down * 7,
-			EvoGameTheorySim.RPSGame.Strategy.Rock,
-			EvoGameTheorySim.RPSGame.Strategy.Rock,
-			rng
+		RegisterAnimation(
+			AnimationUtilities.Parallel(
+				table.ScaleCellToDefault(1, 2),
+				table.ScaleCellToDefault(2, 1),
+				conflictSite3.EatFruit()
+			)
 		);
-		RegisterAnimation(conflictSite4.GrowTreeAndFruit());
-		RegisterAnimation(conflictSite4.BlobsAppear());
-		RegisterAnimation(conflictSite4.Showdown());
-		RegisterAnimation(conflictSite4.EatFruit());
-		
-		
-		var conflictSite5 = new ExampleConflictTree(
-			this,
-			Vector3.Right * 9 + Vector3.Down * 7,
-			EvoGameTheorySim.RPSGame.Strategy.Paper,
-			EvoGameTheorySim.RPSGame.Strategy.Paper,
-			rng
+		RegisterAnimation(
+			AnimationUtilities.Parallel(
+				table.ScaleCellToDefault(1, 1),
+				table.ScaleCellToDefault(2, 2).WithDelay(0.1f),
+				table.ScaleCellToDefault(3, 3).WithDelay(0.2f)
+			),
+			32
 		);
-		RegisterAnimation(conflictSite5.GrowTreeAndFruit());
-		RegisterAnimation(conflictSite5.BlobsAppear());
-		RegisterAnimation(conflictSite5.Showdown());
-		RegisterAnimation(conflictSite5.EatFruit());
-		
-		var conflictSite6 = new ExampleConflictTree(
-			this,
-			Vector3.Right * 18 + Vector3.Down * 7,
-			EvoGameTheorySim.RPSGame.Strategy.Scissors,
-			EvoGameTheorySim.RPSGame.Strategy.Scissors,
-			rng
-		);
-		RegisterAnimation(conflictSite6.GrowTreeAndFruit());
-		RegisterAnimation(conflictSite6.BlobsAppear());
-		RegisterAnimation(conflictSite6.Showdown());
-		RegisterAnimation(conflictSite6.EatFruit());
 		
 		#endregion
+		
+		// Push everything beyond here back.
+		// RegisterAnimation( new Animation(), 1000);
+		
+		// #region Up to six trees
+		//
+		// RegisterAnimation(
+		// 	AnimationUtilities.Parallel(
+		// 		// Actual intended movement
+		// 		camRig.MoveTo(new Vector3(9f, 0, 0)),
+		// 		camRig.ZoomTo(30)
+		// 	)
+		// );
+		//
+		// var conflictSite4 = new ExampleConflictTree(
+		// 	this,
+		// 	position: Vector3.Zero + Vector3.Down * 7,
+		// 	EvoGameTheorySim.RPSGame.Strategy.Rock,
+		// 	EvoGameTheorySim.RPSGame.Strategy.Rock,
+		// 	rng
+		// );
+		// RegisterAnimation(conflictSite4.GrowTreeAndFruit());
+		// RegisterAnimation(conflictSite4.BlobsAppear());
+		// RegisterAnimation(conflictSite4.Showdown());
+		// RegisterAnimation(conflictSite4.EatFruit());
+		//
+		//
+		// var conflictSite5 = new ExampleConflictTree(
+		// 	this,
+		// 	Vector3.Right * 9 + Vector3.Down * 7,
+		// 	EvoGameTheorySim.RPSGame.Strategy.Paper,
+		// 	EvoGameTheorySim.RPSGame.Strategy.Paper,
+		// 	rng
+		// );
+		// RegisterAnimation(conflictSite5.GrowTreeAndFruit());
+		// RegisterAnimation(conflictSite5.BlobsAppear());
+		// RegisterAnimation(conflictSite5.Showdown());
+		// RegisterAnimation(conflictSite5.EatFruit());
+		//
+		// var conflictSite6 = new ExampleConflictTree(
+		// 	this,
+		// 	Vector3.Right * 18 + Vector3.Down * 7,
+		// 	EvoGameTheorySim.RPSGame.Strategy.Scissors,
+		// 	EvoGameTheorySim.RPSGame.Strategy.Scissors,
+		// 	rng
+		// );
+		// RegisterAnimation(conflictSite6.GrowTreeAndFruit());
+		// RegisterAnimation(conflictSite6.BlobsAppear());
+		// RegisterAnimation(conflictSite6.Showdown());
+		// RegisterAnimation(conflictSite6.EatFruit());
+		//
+		// #endregion
 	}
 }

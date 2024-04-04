@@ -43,11 +43,11 @@ public partial class EvoGameTheorySimAnimator : Node3D
         
         
         // Add trees according to the max number of trees
-        var treeScene = ResourceLoader.Load<PackedScene>("res://addons/PrimerAssets/Organized/Trees/Mango trees/Medium mango tree/Resources/mango tree medium.scn");
+        // var treeScene = ResourceLoader.Load<PackedScene>("res://addons/PrimerAssets/Organized/Trees/Mango trees/Medium mango tree/Resources/mango tree medium.scn");
         
         for (var i = 0; i < Sim.NumTrees; i++)
         {
-            var tree = treeScene.Instantiate<Node3D>();
+            var tree = FruitTree.TreeScene.Instantiate<FruitTree>();
             _ground.AddChild(tree);
             tree.Owner = GetTree().EditedSceneRoot;
             tree.Name = "Tree";
