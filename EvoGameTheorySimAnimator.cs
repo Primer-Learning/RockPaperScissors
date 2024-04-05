@@ -23,37 +23,43 @@ public partial class EvoGameTheorySimAnimator : Node3D
     };
     
     public bool IncludeTernaryPlot = true;
-    
-    public void NonAnimatedSetup()
+
+    public Animation MakeGroundAndAnimateAppearance()
     {
         // Make the ground plane
         _ground = new MeshInstance3D();
         _ground.Name = "Ground";
         AddChild(_ground);
         _ground.Owner = GetTree().EditedSceneRoot;
-        
         var planeMesh = new PlaneMesh();
         planeMesh.Size = new Vector2(10, 10);
         _ground.Mesh = planeMesh;
-        // ground.Scale = new Vector3(1, 1, 1);
+        
         _ground.Position = Vector3.Right * 6;
         var groundMaterial = new StandardMaterial3D();
-        groundMaterial.AlbedoColor = new Color(0x1d6114ff);
+        groundMaterial.AlbedoColor = new Color(0x035800ff);
         _ground.Mesh.SurfaceSetMaterial(0, groundMaterial);
         
+        _ground.Scale = Vector3.Zero;
+        return _ground.ScaleTo(Vector3.One);
+    }
+    
+    public Animation MakeTreesAndHomesAndAnimateAppearance()
+    {
+        var animations = new List<Animation>();
         
         // Add trees according to the max number of trees
         // var treeScene = ResourceLoader.Load<PackedScene>("res://addons/PrimerAssets/Organized/Trees/Mango trees/Medium mango tree/Resources/mango tree medium.scn");
-        
         for (var i = 0; i < Sim.NumTrees; i++)
         {
             var tree = FruitTree.TreeScene.Instantiate<FruitTree>();
             _ground.AddChild(tree);
             tree.Owner = GetTree().EditedSceneRoot;
             tree.Name = "Tree";
-            tree.Scale = Vector3.One * 0.1f;
+            tree.Scale = Vector3.Zero;
             tree.Position = new Vector3(_simVisualizationRng.RangeFloat(-5, 5), 0, _simVisualizationRng.RangeFloat(-5, 5));
             _trees.Add(tree);
+            animations.Add(tree.ScaleTo(Vector3.One * 0.1f));
         }
         
         // Add homes
@@ -64,11 +70,17 @@ public partial class EvoGameTheorySimAnimator : Node3D
             _ground.AddChild(home);
             home.Owner = GetTree().EditedSceneRoot;
             home.Name = "Home";
-            home.Scale = Vector3.One * 0.5f;
+            home.Scale = Vector3.Zero;
             home.Position = new Vector3(_simVisualizationRng.RangeFloat(-5, 5), 0, _simVisualizationRng.RangeFloat(-5, 5));
             _homes.Add(home);
+            animations.Add(home.ScaleTo(Vector3.One * 0.5f));
         }
-        
+
+        return animations.RunInParallel();
+    }
+
+    public void NonAnimatedSetup()
+    {
         if (IncludeTernaryPlot) SetUpTernaryPlot();
     }
 

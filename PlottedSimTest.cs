@@ -14,10 +14,10 @@ public partial class PlottedSimTest : AnimationSequence
         var sim = new EvoGameTheorySim();
         AddChild(sim);
         // sim.NumDays = 50; // 43ish seconds
-        sim.NumDays = 20; // 15 ish seconds
+        sim.NumDays = 5; // 15 ish seconds
         // sim.NumDays = 100; // Crash
         sim.InitialBlobCount = 40;
-        sim.NumTrees = 20;
+        sim.NumTrees = 5;
         sim.RunSim();
         
         // GD.Print("Sim time: " + stopwatch.ElapsedMilliseconds);
