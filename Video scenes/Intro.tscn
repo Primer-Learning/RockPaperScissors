@@ -1,8 +1,14 @@
-[gd_scene load_steps=19 format=3 uid="uid://cqkh8mwjqikb1"]
+[gd_scene load_steps=25 format=3 uid="uid://cqkh8mwjqikb1"]
 
 [ext_resource type="Environment" uid="uid://xpav3hoy6ldu" path="res://addons/PrimerTools/primer_environment.tres" id="1_us5oq"]
 [ext_resource type="AudioStream" uid="uid://bjhc2isgrwtkm" path="res://Voiceover Sketches/Intro.wav" id="2_eo8i0"]
 [ext_resource type="Script" path="res://Video scenes/IntroSequence.cs" id="2_k3ui2"]
+[ext_resource type="PackedScene" uid="uid://664cc0oolmba" path="res://addons/PrimerAssets/Organized/Trees/Mango trees/Medium mango tree/mango_tree_medium.tscn" id="4_7nkc8"]
+[ext_resource type="PackedScene" uid="uid://2d2eu4f87fbb" path="res://addons/PrimerAssets/Organized/Blob/Blobs/blob.tscn" id="5_07g6i"]
+[ext_resource type="PackedScene" uid="uid://dce6oqydowu8s" path="res://addons/PrimerTools/LaTeX/gltf/Rock_f302f0ea.txt.gltf" id="6_3cshm"]
+[ext_resource type="PackedScene" uid="uid://cv8oqjidv810m" path="res://addons/PrimerTools/LaTeX/gltf/Paper_35045eff.txt.gltf" id="7_03mom"]
+[ext_resource type="PackedScene" uid="uid://bd1tgwj6y6urw" path="res://addons/PrimerTools/LaTeX/gltf/Beats_b886ee35.txt.gltf" id="8_fknd4"]
+[ext_resource type="PackedScene" uid="uid://tug6o7ke0tmd" path="res://addons/PrimerTools/Gestures/Arrow/arrow.tscn" id="9_amfqu"]
 [ext_resource type="Script" path="res://addons/PrimerTools/Utilities/CameraRig.cs" id="14_e7pat"]
 [ext_resource type="Script" path="res://addons/PrimerTools/Utilities/FPSViewer.cs" id="15_67tri"]
 
@@ -39,7 +45,7 @@ _data = {
 "CombinedAnimation": SubResource("Animation_cge7r")
 }
 
-[sub_resource type="Animation" id="Animation_mdfb5"]
+[sub_resource type="Animation" id="Animation_ndm1q"]
 length = 0.5
 tracks/0/type = "bezier"
 tracks/0/imported = false
@@ -108,7 +114,7 @@ tracks/5/keys = {
 "times": PackedFloat32Array(0, 0.5)
 }
 
-[sub_resource type="Animation" id="Animation_svgd3"]
+[sub_resource type="Animation" id="Animation_bjjlo"]
 tracks/0/type = "bezier"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -209,7 +215,7 @@ tracks/8/keys = {
 "times": PackedFloat32Array(0.5, 1)
 }
 
-[sub_resource type="Animation" id="Animation_ou18q"]
+[sub_resource type="Animation" id="Animation_dfalw"]
 length = 1.5
 tracks/0/type = "bezier"
 tracks/0/imported = false
@@ -620,7 +626,7 @@ tracks/36/keys = {
 "times": PackedFloat32Array(0.5, 1)
 }
 
-[sub_resource type="Animation" id="Animation_885x2"]
+[sub_resource type="Animation" id="Animation_ps5hc"]
 length = 5.75
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -1631,7 +1637,7 @@ tracks/103/keys = {
 tracks/104/type = "bezier"
 tracks/104/imported = false
 tracks/104/enabled = true
-tracks/104/path = NodePath("TriangleDiagram/@Node3D@390146:scale:x")
+tracks/104/path = NodePath("TriangleDiagram/@Node3D@583480:scale:x")
 tracks/104/interp = 1
 tracks/104/loop_wrap = true
 tracks/104/keys = {
@@ -1642,7 +1648,7 @@ tracks/104/keys = {
 tracks/105/type = "bezier"
 tracks/105/imported = false
 tracks/105/enabled = true
-tracks/105/path = NodePath("TriangleDiagram/@Node3D@390146:scale:y")
+tracks/105/path = NodePath("TriangleDiagram/@Node3D@583480:scale:y")
 tracks/105/interp = 1
 tracks/105/loop_wrap = true
 tracks/105/keys = {
@@ -1653,7 +1659,7 @@ tracks/105/keys = {
 tracks/106/type = "bezier"
 tracks/106/imported = false
 tracks/106/enabled = true
-tracks/106/path = NodePath("TriangleDiagram/@Node3D@390146:scale:z")
+tracks/106/path = NodePath("TriangleDiagram/@Node3D@583480:scale:z")
 tracks/106/interp = 1
 tracks/106/loop_wrap = true
 tracks/106/keys = {
@@ -1664,7 +1670,7 @@ tracks/106/keys = {
 tracks/107/type = "bezier"
 tracks/107/imported = false
 tracks/107/enabled = true
-tracks/107/path = NodePath("TriangleDiagram/@Node3D@390146:position:x")
+tracks/107/path = NodePath("TriangleDiagram/@Node3D@583480:position:x")
 tracks/107/interp = 1
 tracks/107/loop_wrap = true
 tracks/107/keys = {
@@ -1675,7 +1681,7 @@ tracks/107/keys = {
 tracks/108/type = "bezier"
 tracks/108/imported = false
 tracks/108/enabled = true
-tracks/108/path = NodePath("TriangleDiagram/@Node3D@390146:position:y")
+tracks/108/path = NodePath("TriangleDiagram/@Node3D@583480:position:y")
 tracks/108/interp = 1
 tracks/108/loop_wrap = true
 tracks/108/keys = {
@@ -1686,7 +1692,7 @@ tracks/108/keys = {
 tracks/109/type = "bezier"
 tracks/109/imported = false
 tracks/109/enabled = true
-tracks/109/path = NodePath("TriangleDiagram/@Node3D@390146:position:z")
+tracks/109/path = NodePath("TriangleDiagram/@Node3D@583480:position:z")
 tracks/109/interp = 1
 tracks/109/loop_wrap = true
 tracks/109/keys = {
@@ -1730,7 +1736,7 @@ tracks/112/keys = {
 tracks/113/type = "bezier"
 tracks/113/imported = false
 tracks/113/enabled = true
-tracks/113/path = NodePath("TriangleDiagram/@Node3D@390147:scale:x")
+tracks/113/path = NodePath("TriangleDiagram/@Node3D@583481:scale:x")
 tracks/113/interp = 1
 tracks/113/loop_wrap = true
 tracks/113/keys = {
@@ -1741,7 +1747,7 @@ tracks/113/keys = {
 tracks/114/type = "bezier"
 tracks/114/imported = false
 tracks/114/enabled = true
-tracks/114/path = NodePath("TriangleDiagram/@Node3D@390147:scale:y")
+tracks/114/path = NodePath("TriangleDiagram/@Node3D@583481:scale:y")
 tracks/114/interp = 1
 tracks/114/loop_wrap = true
 tracks/114/keys = {
@@ -1752,7 +1758,7 @@ tracks/114/keys = {
 tracks/115/type = "bezier"
 tracks/115/imported = false
 tracks/115/enabled = true
-tracks/115/path = NodePath("TriangleDiagram/@Node3D@390147:scale:z")
+tracks/115/path = NodePath("TriangleDiagram/@Node3D@583481:scale:z")
 tracks/115/interp = 1
 tracks/115/loop_wrap = true
 tracks/115/keys = {
@@ -1763,7 +1769,7 @@ tracks/115/keys = {
 tracks/116/type = "bezier"
 tracks/116/imported = false
 tracks/116/enabled = true
-tracks/116/path = NodePath("TriangleDiagram/@Node3D@390147:position:x")
+tracks/116/path = NodePath("TriangleDiagram/@Node3D@583481:position:x")
 tracks/116/interp = 1
 tracks/116/loop_wrap = true
 tracks/116/keys = {
@@ -1774,7 +1780,7 @@ tracks/116/keys = {
 tracks/117/type = "bezier"
 tracks/117/imported = false
 tracks/117/enabled = true
-tracks/117/path = NodePath("TriangleDiagram/@Node3D@390147:position:y")
+tracks/117/path = NodePath("TriangleDiagram/@Node3D@583481:position:y")
 tracks/117/interp = 1
 tracks/117/loop_wrap = true
 tracks/117/keys = {
@@ -1785,7 +1791,7 @@ tracks/117/keys = {
 tracks/118/type = "bezier"
 tracks/118/imported = false
 tracks/118/enabled = true
-tracks/118/path = NodePath("TriangleDiagram/@Node3D@390147:position:z")
+tracks/118/path = NodePath("TriangleDiagram/@Node3D@583481:position:z")
 tracks/118/interp = 1
 tracks/118/loop_wrap = true
 tracks/118/keys = {
@@ -3465,7 +3471,7 @@ tracks/295/keys = {
 "times": PackedFloat32Array(3.5, 3.75, 4, 4.25, 5.5, 5.75)
 }
 
-[sub_resource type="Animation" id="Animation_0ay6b"]
+[sub_resource type="Animation" id="Animation_swyh3"]
 length = 0.5
 tracks/0/type = "bezier"
 tracks/0/imported = false
@@ -3501,12 +3507,12 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0, 0.5)
 }
 
-[sub_resource type="Animation" id="Animation_s7s2y"]
+[sub_resource type="Animation" id="Animation_501pr"]
 length = 0.8
 tracks/0/type = "bezier"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Reward matrix/@Node3D@390149:scale:x")
+tracks/0/path = NodePath("Reward matrix/@Node3D@583483:scale:x")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -3517,7 +3523,7 @@ tracks/0/keys = {
 tracks/1/type = "bezier"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Reward matrix/@Node3D@390149:scale:y")
+tracks/1/path = NodePath("Reward matrix/@Node3D@583483:scale:y")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -3528,7 +3534,7 @@ tracks/1/keys = {
 tracks/2/type = "bezier"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Reward matrix/@Node3D@390149:scale:z")
+tracks/2/path = NodePath("Reward matrix/@Node3D@583483:scale:z")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -3539,7 +3545,7 @@ tracks/2/keys = {
 tracks/3/type = "bezier"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Reward matrix/@Node3D@390153:scale:x")
+tracks/3/path = NodePath("Reward matrix/@Node3D@583487:scale:x")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -3550,7 +3556,7 @@ tracks/3/keys = {
 tracks/4/type = "bezier"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Reward matrix/@Node3D@390153:scale:y")
+tracks/4/path = NodePath("Reward matrix/@Node3D@583487:scale:y")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -3561,7 +3567,7 @@ tracks/4/keys = {
 tracks/5/type = "bezier"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Reward matrix/@Node3D@390153:scale:z")
+tracks/5/path = NodePath("Reward matrix/@Node3D@583487:scale:z")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
@@ -3572,7 +3578,7 @@ tracks/5/keys = {
 tracks/6/type = "bezier"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Reward matrix/@Node3D@390150:scale:x")
+tracks/6/path = NodePath("Reward matrix/@Node3D@583484:scale:x")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
@@ -3583,7 +3589,7 @@ tracks/6/keys = {
 tracks/7/type = "bezier"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Reward matrix/@Node3D@390150:scale:y")
+tracks/7/path = NodePath("Reward matrix/@Node3D@583484:scale:y")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
@@ -3594,7 +3600,7 @@ tracks/7/keys = {
 tracks/8/type = "bezier"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("Reward matrix/@Node3D@390150:scale:z")
+tracks/8/path = NodePath("Reward matrix/@Node3D@583484:scale:z")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
@@ -3605,7 +3611,7 @@ tracks/8/keys = {
 tracks/9/type = "bezier"
 tracks/9/imported = false
 tracks/9/enabled = true
-tracks/9/path = NodePath("Reward matrix/@Node3D@390154:scale:x")
+tracks/9/path = NodePath("Reward matrix/@Node3D@583488:scale:x")
 tracks/9/interp = 1
 tracks/9/loop_wrap = true
 tracks/9/keys = {
@@ -3616,7 +3622,7 @@ tracks/9/keys = {
 tracks/10/type = "bezier"
 tracks/10/imported = false
 tracks/10/enabled = true
-tracks/10/path = NodePath("Reward matrix/@Node3D@390154:scale:y")
+tracks/10/path = NodePath("Reward matrix/@Node3D@583488:scale:y")
 tracks/10/interp = 1
 tracks/10/loop_wrap = true
 tracks/10/keys = {
@@ -3627,7 +3633,7 @@ tracks/10/keys = {
 tracks/11/type = "bezier"
 tracks/11/imported = false
 tracks/11/enabled = true
-tracks/11/path = NodePath("Reward matrix/@Node3D@390154:scale:z")
+tracks/11/path = NodePath("Reward matrix/@Node3D@583488:scale:z")
 tracks/11/interp = 1
 tracks/11/loop_wrap = true
 tracks/11/keys = {
@@ -3638,7 +3644,7 @@ tracks/11/keys = {
 tracks/12/type = "bezier"
 tracks/12/imported = false
 tracks/12/enabled = true
-tracks/12/path = NodePath("Reward matrix/@Node3D@390151:scale:x")
+tracks/12/path = NodePath("Reward matrix/@Node3D@583485:scale:x")
 tracks/12/interp = 1
 tracks/12/loop_wrap = true
 tracks/12/keys = {
@@ -3649,7 +3655,7 @@ tracks/12/keys = {
 tracks/13/type = "bezier"
 tracks/13/imported = false
 tracks/13/enabled = true
-tracks/13/path = NodePath("Reward matrix/@Node3D@390151:scale:y")
+tracks/13/path = NodePath("Reward matrix/@Node3D@583485:scale:y")
 tracks/13/interp = 1
 tracks/13/loop_wrap = true
 tracks/13/keys = {
@@ -3660,7 +3666,7 @@ tracks/13/keys = {
 tracks/14/type = "bezier"
 tracks/14/imported = false
 tracks/14/enabled = true
-tracks/14/path = NodePath("Reward matrix/@Node3D@390151:scale:z")
+tracks/14/path = NodePath("Reward matrix/@Node3D@583485:scale:z")
 tracks/14/interp = 1
 tracks/14/loop_wrap = true
 tracks/14/keys = {
@@ -3671,7 +3677,7 @@ tracks/14/keys = {
 tracks/15/type = "bezier"
 tracks/15/imported = false
 tracks/15/enabled = true
-tracks/15/path = NodePath("Reward matrix/@Node3D@390155:scale:x")
+tracks/15/path = NodePath("Reward matrix/@Node3D@583489:scale:x")
 tracks/15/interp = 1
 tracks/15/loop_wrap = true
 tracks/15/keys = {
@@ -3682,7 +3688,7 @@ tracks/15/keys = {
 tracks/16/type = "bezier"
 tracks/16/imported = false
 tracks/16/enabled = true
-tracks/16/path = NodePath("Reward matrix/@Node3D@390155:scale:y")
+tracks/16/path = NodePath("Reward matrix/@Node3D@583489:scale:y")
 tracks/16/interp = 1
 tracks/16/loop_wrap = true
 tracks/16/keys = {
@@ -3693,7 +3699,7 @@ tracks/16/keys = {
 tracks/17/type = "bezier"
 tracks/17/imported = false
 tracks/17/enabled = true
-tracks/17/path = NodePath("Reward matrix/@Node3D@390155:scale:z")
+tracks/17/path = NodePath("Reward matrix/@Node3D@583489:scale:z")
 tracks/17/interp = 1
 tracks/17/loop_wrap = true
 tracks/17/keys = {
@@ -3704,7 +3710,7 @@ tracks/17/keys = {
 tracks/18/type = "bezier"
 tracks/18/imported = false
 tracks/18/enabled = true
-tracks/18/path = NodePath("Reward matrix/@Node3D@390152:scale:x")
+tracks/18/path = NodePath("Reward matrix/@Node3D@583486:scale:x")
 tracks/18/interp = 1
 tracks/18/loop_wrap = true
 tracks/18/keys = {
@@ -3715,7 +3721,7 @@ tracks/18/keys = {
 tracks/19/type = "bezier"
 tracks/19/imported = false
 tracks/19/enabled = true
-tracks/19/path = NodePath("Reward matrix/@Node3D@390152:scale:y")
+tracks/19/path = NodePath("Reward matrix/@Node3D@583486:scale:y")
 tracks/19/interp = 1
 tracks/19/loop_wrap = true
 tracks/19/keys = {
@@ -3726,7 +3732,7 @@ tracks/19/keys = {
 tracks/20/type = "bezier"
 tracks/20/imported = false
 tracks/20/enabled = true
-tracks/20/path = NodePath("Reward matrix/@Node3D@390152:scale:z")
+tracks/20/path = NodePath("Reward matrix/@Node3D@583486:scale:z")
 tracks/20/interp = 1
 tracks/20/loop_wrap = true
 tracks/20/keys = {
@@ -3735,11 +3741,11 @@ tracks/20/keys = {
 "times": PackedFloat32Array(0.3, 0.8)
 }
 
-[sub_resource type="Animation" id="Animation_syqut"]
+[sub_resource type="Animation" id="Animation_vkutp"]
 tracks/0/type = "bezier"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Reward matrix/@Node3D@390162:scale:x")
+tracks/0/path = NodePath("Reward matrix/@Node3D@583496:scale:x")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -3750,7 +3756,7 @@ tracks/0/keys = {
 tracks/1/type = "bezier"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Reward matrix/@Node3D@390162:scale:y")
+tracks/1/path = NodePath("Reward matrix/@Node3D@583496:scale:y")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -3761,7 +3767,7 @@ tracks/1/keys = {
 tracks/2/type = "bezier"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Reward matrix/@Node3D@390162:scale:z")
+tracks/2/path = NodePath("Reward matrix/@Node3D@583496:scale:z")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -3772,7 +3778,7 @@ tracks/2/keys = {
 tracks/3/type = "bezier"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Reward matrix/@Node3D@390158:scale:x")
+tracks/3/path = NodePath("Reward matrix/@Node3D@583492:scale:x")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -3783,7 +3789,7 @@ tracks/3/keys = {
 tracks/4/type = "bezier"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Reward matrix/@Node3D@390158:scale:y")
+tracks/4/path = NodePath("Reward matrix/@Node3D@583492:scale:y")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -3794,7 +3800,7 @@ tracks/4/keys = {
 tracks/5/type = "bezier"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Reward matrix/@Node3D@390158:scale:z")
+tracks/5/path = NodePath("Reward matrix/@Node3D@583492:scale:z")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
@@ -3935,11 +3941,11 @@ tracks/17/keys = {
 "times": PackedFloat32Array(0.5, 1)
 }
 
-[sub_resource type="Animation" id="Animation_u1jj0"]
+[sub_resource type="Animation" id="Animation_xbov6"]
 tracks/0/type = "bezier"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Reward matrix/@Node3D@390163:scale:x")
+tracks/0/path = NodePath("Reward matrix/@Node3D@583497:scale:x")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -3950,7 +3956,7 @@ tracks/0/keys = {
 tracks/1/type = "bezier"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Reward matrix/@Node3D@390163:scale:y")
+tracks/1/path = NodePath("Reward matrix/@Node3D@583497:scale:y")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -3961,7 +3967,7 @@ tracks/1/keys = {
 tracks/2/type = "bezier"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Reward matrix/@Node3D@390163:scale:z")
+tracks/2/path = NodePath("Reward matrix/@Node3D@583497:scale:z")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -3972,7 +3978,7 @@ tracks/2/keys = {
 tracks/3/type = "bezier"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Reward matrix/@Node3D@390161:scale:x")
+tracks/3/path = NodePath("Reward matrix/@Node3D@583495:scale:x")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -3983,7 +3989,7 @@ tracks/3/keys = {
 tracks/4/type = "bezier"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Reward matrix/@Node3D@390161:scale:y")
+tracks/4/path = NodePath("Reward matrix/@Node3D@583495:scale:y")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -3994,7 +4000,7 @@ tracks/4/keys = {
 tracks/5/type = "bezier"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Reward matrix/@Node3D@390161:scale:z")
+tracks/5/path = NodePath("Reward matrix/@Node3D@583495:scale:z")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
@@ -4135,11 +4141,11 @@ tracks/17/keys = {
 "times": PackedFloat32Array(0.5, 1)
 }
 
-[sub_resource type="Animation" id="Animation_kukyv"]
+[sub_resource type="Animation" id="Animation_6dlmm"]
 tracks/0/type = "bezier"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Reward matrix/@Node3D@390157:scale:x")
+tracks/0/path = NodePath("Reward matrix/@Node3D@583491:scale:x")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -4150,7 +4156,7 @@ tracks/0/keys = {
 tracks/1/type = "bezier"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Reward matrix/@Node3D@390157:scale:y")
+tracks/1/path = NodePath("Reward matrix/@Node3D@583491:scale:y")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -4161,7 +4167,7 @@ tracks/1/keys = {
 tracks/2/type = "bezier"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Reward matrix/@Node3D@390157:scale:z")
+tracks/2/path = NodePath("Reward matrix/@Node3D@583491:scale:z")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -4172,7 +4178,7 @@ tracks/2/keys = {
 tracks/3/type = "bezier"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Reward matrix/@Node3D@390159:scale:x")
+tracks/3/path = NodePath("Reward matrix/@Node3D@583493:scale:x")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -4183,7 +4189,7 @@ tracks/3/keys = {
 tracks/4/type = "bezier"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Reward matrix/@Node3D@390159:scale:y")
+tracks/4/path = NodePath("Reward matrix/@Node3D@583493:scale:y")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -4194,7 +4200,7 @@ tracks/4/keys = {
 tracks/5/type = "bezier"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Reward matrix/@Node3D@390159:scale:z")
+tracks/5/path = NodePath("Reward matrix/@Node3D@583493:scale:z")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
@@ -4335,12 +4341,12 @@ tracks/17/keys = {
 "times": PackedFloat32Array(0.5, 1)
 }
 
-[sub_resource type="Animation" id="Animation_t2va2"]
+[sub_resource type="Animation" id="Animation_mbngs"]
 length = 0.7
 tracks/0/type = "bezier"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Reward matrix/@Node3D@390156:scale:x")
+tracks/0/path = NodePath("Reward matrix/@Node3D@583490:scale:x")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -4351,7 +4357,7 @@ tracks/0/keys = {
 tracks/1/type = "bezier"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Reward matrix/@Node3D@390156:scale:y")
+tracks/1/path = NodePath("Reward matrix/@Node3D@583490:scale:y")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -4362,7 +4368,7 @@ tracks/1/keys = {
 tracks/2/type = "bezier"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Reward matrix/@Node3D@390156:scale:z")
+tracks/2/path = NodePath("Reward matrix/@Node3D@583490:scale:z")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
@@ -4373,7 +4379,7 @@ tracks/2/keys = {
 tracks/3/type = "bezier"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Reward matrix/@Node3D@390160:scale:x")
+tracks/3/path = NodePath("Reward matrix/@Node3D@583494:scale:x")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
@@ -4384,7 +4390,7 @@ tracks/3/keys = {
 tracks/4/type = "bezier"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Reward matrix/@Node3D@390160:scale:y")
+tracks/4/path = NodePath("Reward matrix/@Node3D@583494:scale:y")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -4395,7 +4401,7 @@ tracks/4/keys = {
 tracks/5/type = "bezier"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Reward matrix/@Node3D@390160:scale:z")
+tracks/5/path = NodePath("Reward matrix/@Node3D@583494:scale:z")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
@@ -4406,7 +4412,7 @@ tracks/5/keys = {
 tracks/6/type = "bezier"
 tracks/6/imported = false
 tracks/6/enabled = true
-tracks/6/path = NodePath("Reward matrix/@Node3D@390164:scale:x")
+tracks/6/path = NodePath("Reward matrix/@Node3D@583498:scale:x")
 tracks/6/interp = 1
 tracks/6/loop_wrap = true
 tracks/6/keys = {
@@ -4417,7 +4423,7 @@ tracks/6/keys = {
 tracks/7/type = "bezier"
 tracks/7/imported = false
 tracks/7/enabled = true
-tracks/7/path = NodePath("Reward matrix/@Node3D@390164:scale:y")
+tracks/7/path = NodePath("Reward matrix/@Node3D@583498:scale:y")
 tracks/7/interp = 1
 tracks/7/loop_wrap = true
 tracks/7/keys = {
@@ -4428,7 +4434,7 @@ tracks/7/keys = {
 tracks/8/type = "bezier"
 tracks/8/imported = false
 tracks/8/enabled = true
-tracks/8/path = NodePath("Reward matrix/@Node3D@390164:scale:z")
+tracks/8/path = NodePath("Reward matrix/@Node3D@583498:scale:z")
 tracks/8/interp = 1
 tracks/8/loop_wrap = true
 tracks/8/keys = {
@@ -4437,18 +4443,18 @@ tracks/8/keys = {
 "times": PackedFloat32Array(0.2, 0.7)
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_lvadc"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_em3b8"]
 _data = {
-"anim0": SubResource("Animation_mdfb5"),
-"anim1": SubResource("Animation_svgd3"),
-"anim2": SubResource("Animation_ou18q"),
-"anim3": SubResource("Animation_885x2"),
-"anim4": SubResource("Animation_0ay6b"),
-"anim5": SubResource("Animation_s7s2y"),
-"anim6": SubResource("Animation_syqut"),
-"anim7": SubResource("Animation_u1jj0"),
-"anim8": SubResource("Animation_kukyv"),
-"anim9": SubResource("Animation_t2va2")
+"anim0": SubResource("Animation_ndm1q"),
+"anim1": SubResource("Animation_bjjlo"),
+"anim2": SubResource("Animation_dfalw"),
+"anim3": SubResource("Animation_ps5hc"),
+"anim4": SubResource("Animation_swyh3"),
+"anim5": SubResource("Animation_501pr"),
+"anim6": SubResource("Animation_vkutp"),
+"anim7": SubResource("Animation_xbov6"),
+"anim8": SubResource("Animation_6dlmm"),
+"anim9": SubResource("Animation_mbngs")
 }
 
 [node name="Intro" type="Node3D"]
@@ -4467,11 +4473,50 @@ RewindOnRun = true
 
 [node name="ReferenceAnimationPlayer" type="AnimationPlayer" parent="AnimationPlayer"]
 libraries = {
-"r": SubResource("AnimationLibrary_lvadc")
+"r": SubResource("AnimationLibrary_em3b8")
 }
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, -6.82311e-15, 1.24657e-14, 0, 0.877196, 0.480132, -1.42109e-14, -0.480132, 0.877196, 9.53674e-07, 7.27639, 5.9181)
+transform = Transform3D(1, -6.82311e-15, 1.24657e-14, 0, 0.877196, 0.480132, -1.42109e-14, -0.480132, 0.877196, 6.79782, 2.03149, 5.9181)
+
+[node name="Tree2" parent="DirectionalLight3D" instance=ExtResource("4_7nkc8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.572711, -0.405031, -8.33816)
+
+[node name="Scissors Blob2" parent="DirectionalLight3D" instance=ExtResource("5_07g6i")]
+transform = Transform3D(0.173648, 0, 0.984808, 0, 1, -2.98023e-08, -0.984808, 0, 0.173648, -2.57271, -0.405031, -6.33816)
+
+[node name="Paper Blob" parent="DirectionalLight3D" instance=ExtResource("5_07g6i")]
+transform = Transform3D(0.173648, 0, -0.984808, 0, 1, -2.98023e-08, 0.984808, 0, 0.173648, 1.42729, -0.405031, -6.33816)
+
+[node name="Rock_f302f0ea_txt" parent="DirectionalLight3D" instance=ExtResource("6_3cshm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.372944, -11.1694, -8.33816)
+
+[node name="Paper_35045eff_txt" parent="DirectionalLight3D" instance=ExtResource("7_03mom")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.123488, -11.026, -8.33816)
+
+[node name="Beats_b886ee35_txt" parent="DirectionalLight3D" instance=ExtResource("8_fknd4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.76291, -14.6608, -8.33816)
+
+[node name="_Node3D_583480" parent="DirectionalLight3D" instance=ExtResource("9_amfqu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.82604, -11.4208, -8.33816)
+tailPadding = 2.5
+headPadding = 2.0
+width = 3.0
+Length = 9.0
+XYPlaneRotation = 0.0
+tailPoint = Vector3(9, 0, 0)
+
+[node name="_Node3D_583481" parent="DirectionalLight3D" instance=ExtResource("9_amfqu")]
+transform = Transform3D(-0.600001, 0.799999, 0, -0.799999, -0.600001, 0, 0, 0, 1, -0.326038, -5.42079, -8.33816)
+tailPadding = 1.0
+headPadding = 1.5
+width = 3.0
+Length = 7.5
+XYPlaneRotation = -126.87
+tailPoint = Vector3(-4.5, -6, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="DirectionalLight3D"]
+transform = Transform3D(1, -6.82311e-15, 1.24658e-14, 0, 0.877196, 0.480132, -1.42109e-14, -0.480132, 0.877196, -0.326037, -1.6444, -2.42006)
 
 [node name="CameraRig" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 6, 0)

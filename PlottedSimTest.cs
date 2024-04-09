@@ -36,7 +36,7 @@ public partial class PlottedSimTest : AnimationSequence
         // GD.Print("Non-animated time: " + stopwatch.ElapsedMilliseconds);
         // stopwatch.Restart();
         
-        RegisterAnimation(simAnimator.AnimateDays());
+        RegisterAnimation(simAnimator.AnimateAllDays());
         // GD.Print("Total animation generation time: " + stopwatch.ElapsedMilliseconds);
         // stopwatch.Restart();
         #endregion

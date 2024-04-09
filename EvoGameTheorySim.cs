@@ -97,12 +97,11 @@ public partial class EvoGameTheorySim : Node
      		{
      			// var strategy = new Game.Player((Game.Strategy)(i % 3)); // Even mix
      			// var strategy = new Game.Player((Game.Strategy)_rng.RangeInt(3)); // Random mix
-     			var strategy = (i % 4) switch
+     			var strategy = (i % 3) switch
      			{
      				0 => RPSGame.Strategy.Rock,
      				1 => RPSGame.Strategy.Paper,
      				2 => RPSGame.Strategy.Scissors,
-     				3 => RPSGame.Strategy.Rock,
      				_ => throw new System.Exception("This should never happen")
      			};
      			

@@ -30,8 +30,7 @@ movie_writer/movie_file="C:/Users/justin/Synced Project Files/Primer repos/Godot
 
 [rendering]
 
-anti_aliasing/quality/msaa_2d=3
+scaling_3d/mode=1
+scaling_3d/scale=2.0
+scaling_3d/fsr_sharpness=2.0
 anti_aliasing/quality/msaa_3d=3
-anti_aliasing/quality/screen_space_aa=1
-anti_aliasing/quality/use_taa=true
-anti_aliasing/quality/use_debanding=true
