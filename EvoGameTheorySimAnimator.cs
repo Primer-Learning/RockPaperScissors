@@ -7,6 +7,8 @@ using PrimerTools.Graph;
 
 public partial class EvoGameTheorySimAnimator : Node3D
 {
+    public bool AnimateBlobs = true;
+    
     public EvoGameTheorySim Sim;
     public MeshInstance3D Ground;
     private Vector2 _groundSize = new (10, 10);
@@ -22,8 +24,6 @@ public partial class EvoGameTheorySimAnimator : Node3D
         { EvoGameTheorySim.RPSGame.Strategy.Paper, PrimerColor.blue },
         { EvoGameTheorySim.RPSGame.Strategy.Scissors, PrimerColor.yellow }
     };
-    
-    public bool IncludeTernaryPlot;
 
     public Animation MakeGroundAndAnimateAppearance(Vector2 size = default)
     {
@@ -107,66 +107,83 @@ public partial class EvoGameTheorySimAnimator : Node3D
         
         foreach (var entitiesToday in Sim.EntitiesByDay)
         {
-            // Make the blobs
-            var appearanceAnimations = new List<Animation>();
-            foreach (var entityId in entitiesToday)
-            {
-                var blob = blobPool.GetFromPool();
-                blobs.Add(entityId, blob);
-                if (blob.GetParent() == null) {Ground.AddChild(blob);}
-                blob.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
-                blob.Owner = GetTree().EditedSceneRoot;
-                blob.Name = "Blob";
-                blob.Scale = Vector3.Zero;
-
-                var parent = Sim.Registry.Parents[entityId];
-                var pos = parent == -1 ? _homes[_simVisualizationRng.RangeInt(_homes.Count)].Position : parentPositions[parent];
-                appearanceAnimations.Add(
-                    AnimationUtilities.Parallel(
-                        blob.MoveTo(pos, duration: 0),
-                        blob.ScaleTo(Vector3.One * 0.1f),
-                        blob.AnimateColor(StrategyColors[Sim.Registry.Strategies[entityId]])
-                    )
-                );
-            }
+            // The final day should not be animated, since it is just the final state
+            // If we want to show the final blobs appearing, we'd have to include the
+            // appearance step of the final day, but not needed for now.
+            if (dayCount == Sim.EntitiesByDay.Length - 1) break;
             
+            // Appearance step
+            var appearanceAnimations = new List<Animation>();
+            if (AnimateBlobs)
+            {
+                // Make the blobs
+                foreach (var entityId in entitiesToday)
+                {
+                    var blob = blobPool.GetFromPool();
+                    blobs.Add(entityId, blob);
+                    if (blob.GetParent() == null) {Ground.AddChild(blob);}
+                    blob.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+                    blob.Owner = GetTree().EditedSceneRoot;
+                    blob.Name = "Blob";
+                    blob.Scale = Vector3.Zero;
+
+                    var parent = Sim.Registry.Parents[entityId];
+                    var pos = parent == -1 ? _homes[_simVisualizationRng.RangeInt(_homes.Count)].Position : parentPositions[parent];
+                    appearanceAnimations.Add(
+                        AnimationUtilities.Parallel(
+                            blob.MoveTo(pos, duration: 0),
+                            blob.ScaleTo(Vector3.One * 0.1f),
+                            blob.AnimateColor(StrategyColors[Sim.Registry.Strategies[entityId]])
+                        )
+                    );
+                }
+            }
             appearanceAnimations.Add(GraphAnimationToDay(dayCount++));
             
             // Move blobs to trees
-            var numGames = entitiesToday.Count - Sim.NumTrees;
-            numGames = Mathf.Max(numGames, 0);
-            numGames = Mathf.Min(numGames, Sim.NumTrees);
             var toTreeAnimations = new List<Animation>();
-            for (var i = 0; i < numGames; i++)
+            if (AnimateBlobs)
             {
-                var blob1 = blobs[entitiesToday[i * 2]];
-                var blob2 = blobs[entitiesToday[i * 2 + 1]];
-                
-                toTreeAnimations.Add(AnimateBlobMovementWithSpeed(blob1, _trees[i].Position));
-                toTreeAnimations.Add(AnimateBlobMovementWithSpeed(blob2, _trees[i].Position));
+                var numGames = entitiesToday.Count - Sim.NumTrees;
+                numGames = Mathf.Max(numGames, 0);
+                numGames = Mathf.Min(numGames, Sim.NumTrees);
+                for (var i = 0; i < numGames; i++)
+                {
+                    var blob1 = blobs[entitiesToday[i * 2]];
+                    var blob2 = blobs[entitiesToday[i * 2 + 1]];
+                    
+                    toTreeAnimations.Add(AnimateBlobMovementWithSpeed(blob1, _trees[i].Position));
+                    toTreeAnimations.Add(AnimateBlobMovementWithSpeed(blob2, _trees[i].Position));
+                }
+                for (var i = numGames * 2; i < entitiesToday.Count; i++)
+                {
+                    var blob = blobs[entitiesToday[i]];
+                    toTreeAnimations.Add(numGames < Sim.NumTrees
+                        ? AnimateBlobMovementWithSpeed(blob, _trees[i - numGames].Position)
+                        : blob.ScaleTo(Vector3.Zero));
+                }
             }
-            for (var i = numGames * 2; i < entitiesToday.Count; i++)
-            {
-                var blob = blobs[entitiesToday[i]];
-                toTreeAnimations.Add(numGames < Sim.NumTrees
-                    ? AnimateBlobMovementWithSpeed(blob, _trees[i - numGames].Position)
-                    : blob.ScaleTo(Vector3.Zero));
-            }
+            // A pause to make the total animation length close to the same whether we animate blobs or not 
+            toTreeAnimations.Add(new Animation().WithDuration(0.5f));
             
             // Move the blobs home
             var toHomeAnimations = new List<Animation>();
-            foreach (var entityId in entitiesToday)
+            if (AnimateBlobs)
             {
-                var blob = blobs[entityId];
-                toHomeAnimations.Add(
-                    AnimationUtilities.Series(
-                        AnimateBlobMovementWithSpeed(blob, _homes[_simVisualizationRng.RangeInt(_homes.Count)].Position),
-                        blob.ScaleTo(Vector3.Zero)
-                    )
-                );
-                parentPositions[entityId] = blob.Position;
-                blobPool.ReturnToPool(blob, unparent: false, makeInvisible: false);
+                foreach (var entityId in entitiesToday)
+                {
+                    var blob = blobs[entityId];
+                    toHomeAnimations.Add(
+                        AnimationUtilities.Series(
+                            AnimateBlobMovementWithSpeed(blob, _homes[_simVisualizationRng.RangeInt(_homes.Count)].Position),
+                            blob.ScaleTo(Vector3.Zero)
+                        )
+                    );
+                    parentPositions[entityId] = blob.Position;
+                    blobPool.ReturnToPool(blob, unparent: false, makeInvisible: false);
+                }
             }
+            toHomeAnimations.Add(new Animation().WithDuration(0.5f));
             
             dailyAnimations.Add(AnimationUtilities.Series(
                     appearanceAnimations.RunInParallel(),
@@ -176,6 +193,8 @@ public partial class EvoGameTheorySimAnimator : Node3D
             );
         }
         
+        // Show the final day's results in the graph
+        dailyAnimations.Add(GraphAnimationToDay(dayCount));
         
         return AnimationUtilities.Series(dailyAnimations.ToArray());
     }
@@ -201,6 +220,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
         return new Animation(); // Instead of null
     }
     
+    public bool IncludeTernaryPlot;
     public TernaryGraph ternaryGraph;
     private CurvePlot2D plot;
     public void SetUpTernaryPlot()
@@ -237,7 +257,8 @@ public partial class EvoGameTheorySimAnimator : Node3D
     public Animation AnimateBarPlotToDay(int dayIndex)
     {
         var dataAsVector = Sim.GetStrategyFrequenciesByDay()[dayIndex];
-        BarPlot.SetData(dataAsVector.X, dataAsVector.Y, dataAsVector.Z);        
+        // We're doing percents, so multiply by 100
+        BarPlot.SetData(dataAsVector.X * 100, dataAsVector.Y * 100, dataAsVector.Z * 100);        
         return BarPlot.Transition();
     }
 }
