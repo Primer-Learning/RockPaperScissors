@@ -47,13 +47,14 @@ public partial class InitialSimScene : AnimationSequence
 		// Run the simulation
 		var sim = new EvoGameTheorySim();
 		AddChild(sim);
-		sim.NumDays = 10;
+		sim.NumDays = 20;
 		sim.InitialBlobCount = 40;
 		sim.NumTrees = 40;
 		sim.RunSim();
 
 		var simAnimator = new EvoGameTheorySimAnimator();
 		AddChild(simAnimator);
+		simAnimator.AnimateBlobs = false;
 		simAnimator.Name = "Sim animator";
 		simAnimator.Owner = GetTree().EditedSceneRoot;
 		simAnimator.Sim = sim;
@@ -119,6 +120,7 @@ public partial class InitialSimScene : AnimationSequence
 		#region Reward explanation
 		RegisterAnimation(conflictSites[1].GrowTreeAndFruit(), 1);
 		RegisterAnimation(conflictSites[1].BlobsAppear());
+		RegisterAnimation(conflictSites[1].Blob1.SetUpPredefinedAnimation("smile", "blob_mouth_state_machine"));
 		
 		// Show the "Winner take all" text
 		winnerTakeAll.Position = new Vector3(-1 * horizontalSpacing, 3 * verticalSpacing - 0.5f, 0);
@@ -200,22 +202,32 @@ public partial class InitialSimScene : AnimationSequence
 		graph.XAxis.showTicCylinders = false;
 		graph.XAxis.showArrows = false;
 		graph.XAxis.max = 3;
+		graph.XAxis.manualTicks = new List<Axis.TicData>
+		{
+			new (1, "Rock"),
+			new (2, "Paper"),
+			new (3, "Scissors")
+		};
 		graph.XAxis.Thiccness = 4;
 		graph.XAxis.showRod = false;
-		graph.XAxis.Visible = false;
+		// graph.XAxis.Visible = false;
 		
-		graph.YAxis.max = 1;
-		graph.YAxis.ticStep = 1;
+		graph.YAxis.max = 100;
+		graph.YAxis.ticStep = 100;
 		graph.YAxis.length = 18;
 		graph.YAxis.Thiccness = 4;
 		graph.YAxis.Visible = false;
 		graph.ZAxis.Visible = false;
 		graph.ZAxis.length = 0;
+		
 		#endregion
 		
 		var barPlot = graph.AddBarPlot();
 		barPlot.ShowValuesOnBars = true;
-		barPlot.SetData(1f/3, 1f/3, 1f/3);
+		barPlot.BarLabelSuffix = "\\%";
+		barPlot.BarLabelScaleFactor = 0.6f;
+		
+		barPlot.SetData(100f/3, 100f/3, 100f/3);
 		RegisterAnimation(graph.Transition());
 
 		#endregion
@@ -248,15 +260,6 @@ public partial class InitialSimScene : AnimationSequence
 		RegisterAnimation(simAnimator.AnimateAllDays(), 87);
 
 		#endregion
-
-
-
-
-
-
-
-
-
 
 		// Old sim running code. Probably reusable but not certain.
 		// RegisterAnimation(simAnimator.AnimateDays());

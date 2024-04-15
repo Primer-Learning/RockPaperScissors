@@ -34,3 +34,4 @@ scaling_3d/mode=1
 scaling_3d/scale=2.0
 scaling_3d/fsr_sharpness=2.0
 anti_aliasing/quality/msaa_3d=3
+viewport/transparent_background=true
