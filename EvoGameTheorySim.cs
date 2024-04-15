@@ -64,8 +64,8 @@ public partial class EvoGameTheorySim : Node
 		
 		private const float GlobalCost = 0.0f;
 		
-		private const float WinMagnitude = 0.5f;
-		private const float TieCost = 0.2f;
+		private const float WinMagnitude = 1f;
+		private const float TieCost = 0.0f;
 		private static readonly float[,] RewardMatrix = new float[3, 3] {
 			{ 1 - TieCost, 1 - WinMagnitude, 1 + 1 * WinMagnitude }, // Rock rewards
 			{ 1 + WinMagnitude, 1 - TieCost, 1 - WinMagnitude }, // Paper rewards   
@@ -86,32 +86,32 @@ public partial class EvoGameTheorySim : Node
 
 	public List<EntityID>[] EntitiesByDay;// = new List<EntityID>[21];
 	public List<EntityID>[] ShuffledParents;
-     	private void Initialize()
+	private void Initialize()
+    {
+     	EntitiesByDay = new List<EntityID>[NumDays + 1];
+     	
+     	_rng = new Rng(Seed == -1 ? System.Environment.TickCount : Seed);
+     	
+     	var blobIDs = new List<EntityID>();
+     	for (var i = 0; i < InitialBlobCount; i++)
      	{
-     		EntitiesByDay = new List<EntityID>[NumDays + 1];
-     		
-     		_rng = new Rng(Seed == -1 ? System.Environment.TickCount : Seed);
-     		
-     		var blobIDs = new List<EntityID>();
-     		for (var i = 0; i < InitialBlobCount; i++)
+     		// var strategy = new Game.Player((Game.Strategy)(i % 3)); // Even mix
+     		// var strategy = new Game.Player((Game.Strategy)_rng.RangeInt(3)); // Random mix
+     		var strategy = (i % 3) switch
      		{
-     			// var strategy = new Game.Player((Game.Strategy)(i % 3)); // Even mix
-     			// var strategy = new Game.Player((Game.Strategy)_rng.RangeInt(3)); // Random mix
-     			var strategy = (i % 3) switch
-     			{
-     				0 => RPSGame.Strategy.Rock,
-     				1 => RPSGame.Strategy.Paper,
-     				2 => RPSGame.Strategy.Scissors,
-     				_ => throw new System.Exception("This should never happen")
-     			};
-     			
-     			blobIDs.Add(Registry.CreateBlob(
-     				strategy,
-     				-1
-     			));
-     		}
-     		EntitiesByDay[0] = blobIDs;
+     			0 => RPSGame.Strategy.Rock,
+     			1 => RPSGame.Strategy.Paper,
+     			2 => RPSGame.Strategy.Scissors,
+     			_ => throw new System.Exception("This should never happen")
+     		};
+     		
+     		blobIDs.Add(Registry.CreateBlob(
+     			strategy,
+     			-1
+     		));
      	}
+     	EntitiesByDay[0] = blobIDs;
+    }
 	private void Simulate()
 	{
 		for (var i = 1; i <= NumDays; i++)
