@@ -29,7 +29,7 @@ public partial class PlottedSimTest : AnimationSequence
         AddChild(simAnimator);
         simAnimator.Owner = GetTree().EditedSceneRoot;
         simAnimator.Sim = sim;
-        simAnimator.IncludeTernaryPlot = true;
+        // simAnimator.IncludeTernaryPlot = true;
         simAnimator.NonAnimatedSetup();
         
         // Spawn and move blobs according to the results

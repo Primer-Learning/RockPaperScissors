@@ -52,7 +52,7 @@ public partial class InitialSimScene : AnimationSequence
 		sim.NumTrees = 40;
 		sim.RunSim();
 
-		var simAnimator = new EvoGameTheorySimAnimator();
+		var simAnimator = EvoGameTheorySimAnimator.NewSimAnimator(new Vector2(20, 20));
 		AddChild(simAnimator);
 		simAnimator.AnimateBlobs = false;
 		simAnimator.Name = "Sim animator";
@@ -120,7 +120,7 @@ public partial class InitialSimScene : AnimationSequence
 		#region Reward explanation
 		RegisterAnimation(conflictSites[1].GrowTreeAndFruit(), 1);
 		RegisterAnimation(conflictSites[1].BlobsAppear());
-		RegisterAnimation(conflictSites[1].Blob1.SetUpPredefinedAnimation("smile", "blob_mouth_state_machine"));
+		RegisterAnimation(conflictSites[1].Blob1.TransitionAnimationTreeCondition("smile", "blob_mouth_state_machine"));
 		
 		// Show the "Winner take all" text
 		winnerTakeAll.Position = new Vector3(-1 * horizontalSpacing, 3 * verticalSpacing - 0.5f, 0);
@@ -190,7 +190,7 @@ public partial class InitialSimScene : AnimationSequence
 		);
 		
 		// Ground appears as a size 20 plane with position 16 to the left
-		RegisterAnimation(simAnimator.MakeGroundAndAnimateAppearance(new Vector2(20, 20)));
+		RegisterAnimation(simAnimator.AnimateAppearance());
 		simAnimator.Ground.Position = new Vector3(15, 0, 0);
 		RegisterAnimation(simAnimator.MakeTreesAndHomesAndAnimateAppearance());
 
