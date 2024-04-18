@@ -11,7 +11,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
     
     public EvoGameTheorySim Sim;
     public MeshInstance3D Ground;
-    private Vector2 _groundSize = new (10, 10);
+    private static Vector2 _groundSize = new (10, 10);
     private readonly List<Node3D> _trees = new();
     private readonly List<Node3D> _homes = new();
     private readonly Rng _simVisualizationRng = new Rng(2);
@@ -25,25 +25,31 @@ public partial class EvoGameTheorySimAnimator : Node3D
         { EvoGameTheorySim.RPSGame.Strategy.Scissors, PrimerColor.yellow }
     };
 
-    public Animation MakeGroundAndAnimateAppearance(Vector2 size = default)
+    public static EvoGameTheorySimAnimator NewSimAnimator(Vector2 size = default)
     {
+        var newSimAnimator = new EvoGameTheorySimAnimator();
+        
         // Make the ground plane
-        Ground = new MeshInstance3D();
-        Ground.Name = "Ground";
-        AddChild(Ground);
-        Ground.Owner = GetTree().EditedSceneRoot;
+        newSimAnimator.Ground = new MeshInstance3D();
+        newSimAnimator.Ground.Name = "Ground";
+        newSimAnimator.AddChild(newSimAnimator.Ground);
         var planeMesh = new PlaneMesh();
 
-        if (size != Vector2.Zero) _groundSize = size;
-        planeMesh.Size = _groundSize;
-        Ground.Mesh = planeMesh;
+        planeMesh.Size = size != Vector2.Zero ? size : _groundSize;
         
-        Ground.Position = Vector3.Right * 6;
+        newSimAnimator.Ground.Mesh = planeMesh;
+        
+        newSimAnimator.Ground.Position = Vector3.Right * 6;
         var groundMaterial = new StandardMaterial3D();
         groundMaterial.AlbedoColor = new Color(0x035800ff);
         // groundMaterial.AlbedoColor = new Color(0xffffffff);
-        Ground.Mesh.SurfaceSetMaterial(0, groundMaterial);
-        
+        newSimAnimator.Ground.Mesh.SurfaceSetMaterial(0, groundMaterial);
+
+        return newSimAnimator;
+    }
+
+    public Animation AnimateAppearance()
+    {
         Ground.Scale = Vector3.Zero;
         return Ground.ScaleTo(Vector3.One);
     }
@@ -59,13 +65,13 @@ public partial class EvoGameTheorySimAnimator : Node3D
             var tree = FruitTree.TreeScene.Instantiate<FruitTree>();
             Ground.AddChild(tree);
             // tree.Owner = GetTree().EditedSceneRoot;
-            tree.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+            // tree.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
             tree.Name = "Tree";
             tree.Scale = Vector3.Zero;
             tree.Position = new Vector3(
-                _simVisualizationRng.RangeFloat(-_groundSize.X / 2, _groundSize.X / 2),
+                _simVisualizationRng.RangeFloat(- ((PlaneMesh) Ground.Mesh).Size.X / 2, ((PlaneMesh) Ground.Mesh).Size.X / 2),
                 0,
-                _simVisualizationRng.RangeFloat(-_groundSize.Y / 2, _groundSize.Y / 2)
+                _simVisualizationRng.RangeFloat(-((PlaneMesh) Ground.Mesh).Size.Y / 2, ((PlaneMesh) Ground.Mesh).Size.Y / 2)
             );
             _trees.Add(tree);
             animations.Add(tree.ScaleTo(Vector3.One * 0.1f));
@@ -77,7 +83,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
         {
             var home = homeScene.Instantiate<Node3D>();
             Ground.AddChild(home);
-            home.Owner = GetTree().EditedSceneRoot;
+            // home.Owner = GetTree().EditedSceneRoot;
             home.Name = "Home";
             home.Scale = Vector3.Zero;
             home.Position = new Vector3(_simVisualizationRng.RangeFloat(-5, 5), 0, _simVisualizationRng.RangeFloat(-5, 5));
@@ -90,8 +96,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
 
     public void NonAnimatedSetup()
     {
-        if (IncludeTernaryPlot) SetUpTernaryPlot();
-        MakeGroundAndAnimateAppearance();
+        AnimateAppearance();
         MakeTreesAndHomesAndAnimateAppearance();
     }
 
@@ -207,7 +212,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
 
     private Animation GraphAnimationToDay(int dayCount)
     {
-        if (IncludeTernaryPlot)
+        if (ternaryGraph != null)
         {
             return AnimateTernaryPlotToDay(dayCount);
         }
@@ -220,13 +225,13 @@ public partial class EvoGameTheorySimAnimator : Node3D
         return new Animation(); // Instead of null
     }
     
-    public bool IncludeTernaryPlot;
     public TernaryGraph ternaryGraph;
     private CurvePlot2D plot;
-    public void SetUpTernaryPlot()
+    public TernaryGraph SetUpTernaryPlot()
     {
-        if (ternaryGraph != null) return;
+        if (ternaryGraph != null) return ternaryGraph;
         ternaryGraph = new TernaryGraph();
+        ternaryGraph.Name = "Ternary Graph";
         AddChild(ternaryGraph);
         ternaryGraph.Owner = GetTree().EditedSceneRoot;
         ternaryGraph.Scale = Vector3.One * 10;
@@ -243,7 +248,9 @@ public partial class EvoGameTheorySimAnimator : Node3D
         plot = new CurvePlot2D();
         ternaryGraph.AddChild(plot);
         plot.Owner = GetTree().EditedSceneRoot;
-        plot.Width = 3;
+        plot.Width = 10;
+
+        return ternaryGraph;
     }
     public Animation AnimateTernaryPlotToDay(int dayIndex)
     {
