@@ -33,6 +33,7 @@ public partial class FindStabilityScene : AnimationSequence
 			winMagnitude: 1f,
 			tieCost: 1
 		);
+		sim.InitialAlleleFrequencies = new[] { 5f, 1f, 1f };
 		AddChild(sim);
 		sim.NumDays = 200;
 		sim.InitialBlobCount = 400;

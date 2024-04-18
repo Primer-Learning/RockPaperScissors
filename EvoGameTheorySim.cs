@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using Godot;
 using PrimerTools;
 using System.Linq;
@@ -86,7 +88,7 @@ public partial class EvoGameTheorySim : Node
 	public int NumDays = 20;
 	public int InitialBlobCount = 32;
 	public int NumTrees = 50;
-	
+	public float[] InitialAlleleFrequencies;
 	#endregion
 
 	#region Simulation
@@ -96,26 +98,37 @@ public partial class EvoGameTheorySim : Node
 	public RPSGame RpsGame;
 	private void Initialize()
 	{
-		RpsGame ??= new RPSGame();
-     	EntitiesByDay = new List<EntityID>[NumDays + 1];
-     	
      	_rng = new Rng(Seed == -1 ? System.Environment.TickCount : Seed);
+		RpsGame ??= new RPSGame();
+		
+		if (InitialAlleleFrequencies is not { Length: 3 })
+		{
+			GD.PushWarning("No valid initial frequencies defined. Using even distribution.");
+			InitialAlleleFrequencies = new[] { 1 / 3f, 1 / 3f, 1 / 3f };
+		}
+
+		var sum = InitialAlleleFrequencies.Sum();
+		if ( Mathf.Abs(sum - 1) > 0.001f ) GD.PushWarning("Initial allele frequencies don't add to 1. Normalizing.");
+		InitialAlleleFrequencies = InitialAlleleFrequencies.Select(x => x / sum).ToArray();
+		
+        EntitiesByDay = new List<EntityID>[NumDays + 1];
      	
      	var blobIDs = new List<EntityID>();
-     	for (var i = 0; i < InitialBlobCount; i++)
-     	{
-     		// var strategy = new Game.Player((Game.Strategy)(i % 3)); // Even mix
-     		// var strategy = new Game.Player((Game.Strategy)_rng.RangeInt(3)); // Random mix
-     		var strategy = (i % 3) switch
-     		{
-     			0 => RPSGame.Strategy.Rock,
-     			1 => RPSGame.Strategy.Paper,
-     			2 => RPSGame.Strategy.Scissors,
-     			_ => throw new System.Exception("This should never happen")
-     		};
+        var strats = Enum.GetValues<RPSGame.Strategy>();
+        var currentStratIndex = -1;
+        var currentStratTargetTotal = 0;
+        for (var i = 0; i < InitialBlobCount; i++)
+        {
+	        // while here so we skip alleles with zero initial frequencies
+	        while (i >= currentStratTargetTotal)
+	        {
+		        if (InitialAlleleFrequencies.Length == currentStratIndex + 1) break; // Prevent incrementing too far.
+		        currentStratIndex++;
+		        currentStratTargetTotal = Mathf.RoundToInt(currentStratTargetTotal + InitialAlleleFrequencies[currentStratIndex] * InitialBlobCount);
+	        }
      		
      		blobIDs.Add(Registry.CreateBlob(
-     			strategy,
+     			strats[currentStratIndex],
      			-1
      		));
      	}
