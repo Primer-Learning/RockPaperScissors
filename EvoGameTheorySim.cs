@@ -48,8 +48,15 @@ public partial class EvoGameTheorySim : Node
 	}
 	#endregion
 	
-	public static class RPSGame
+	public class RPSGame
 	{
+		public RPSGame(float winMagnitude, float tieCost)
+		{
+			WinMagnitude = winMagnitude;
+			TieCost = tieCost;
+		}
+		public RPSGame(){ GD.PushWarning("Creating default RPSGame.");}
+		
 		public enum Strategy
 		{
 			Rock,
@@ -57,16 +64,16 @@ public partial class EvoGameTheorySim : Node
 			Scissors
 		}
 		
-		public static (float reward1, float reward2) GetRewards(Strategy strategy1, Strategy strategy2)
+		public (float reward1, float reward2) GetRewards(Strategy strategy1, Strategy strategy2)
 		{
 			return (RewardMatrix[(int)strategy1, (int)strategy2], RewardMatrix[(int)strategy2, (int)strategy1] - GlobalCost);
 		}
 		
 		private const float GlobalCost = 0.0f;
 		
-		private const float WinMagnitude = 1f;
-		private const float TieCost = 0.0f;
-		private static readonly float[,] RewardMatrix = new float[3, 3] {
+		public float WinMagnitude = 1f;
+		public float TieCost = 0.0f;
+		private float[,] RewardMatrix => new float[3, 3] {
 			{ 1 - TieCost, 1 - WinMagnitude, 1 + 1 * WinMagnitude }, // Rock rewards
 			{ 1 + WinMagnitude, 1 - TieCost, 1 - WinMagnitude }, // Paper rewards   
 			{ 1 - WinMagnitude, 1 + WinMagnitude, 1 - TieCost}  // Scissors rewards
@@ -86,8 +93,10 @@ public partial class EvoGameTheorySim : Node
 
 	public List<EntityID>[] EntitiesByDay;// = new List<EntityID>[21];
 	public List<EntityID>[] ShuffledParents;
+	public RPSGame RpsGame;
 	private void Initialize()
-    {
+	{
+		RpsGame ??= new RPSGame();
      	EntitiesByDay = new List<EntityID>[NumDays + 1];
      	
      	_rng = new Rng(Seed == -1 ? System.Environment.TickCount : Seed);
@@ -129,7 +138,7 @@ public partial class EvoGameTheorySim : Node
 				var parent1Strategy = Registry.Strategies[shuffledParents[j]];
 				var parent2Stategy = Registry.Strategies[shuffledParents[j+1]];
 				
-				var (reward1, reward2) = RPSGame.GetRewards(parent1Strategy, parent2Stategy);
+				var (reward1, reward2) = RpsGame.GetRewards(parent1Strategy, parent2Stategy);
 				
 				for (var k = 0; k < GetOffspringCount(reward1); k++)
 				{
