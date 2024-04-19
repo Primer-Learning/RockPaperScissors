@@ -236,7 +236,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
         ternaryGraph.Owner = GetTree().EditedSceneRoot;
         ternaryGraph.Scale = Vector3.One * 10;
         ternaryGraph.Position = Vector3.Left * 11;
-        ternaryGraph.Labels = new [] {"Rock", "Paper", "Scissors"};
+        ternaryGraph.LabelStrings = new [] {"Rock", "Paper", "Scissors"};
         ternaryGraph.Colors = new []
         {
             StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],

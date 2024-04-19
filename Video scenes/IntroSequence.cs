@@ -143,9 +143,9 @@ public partial class IntroSequence : AnimationSequence
 		// arrow1.Owner = GetTree().EditedSceneRoot;
 		arrow1.nodeThatTailFollows = rockText;
 		arrow1.nodeThatHeadFollows = scissorsText;
-		arrow1.width = 3;
-		arrow1.headPadding = 1f;
-		arrow1.tailPadding = 1.5f;
+		arrow1.Chonk = 3;
+		arrow1.HeadPadding = 1f;
+		arrow1.TailPadding = 1.5f;
 		arrow1.Update();
 		arrow1.Scale = Vector3.Zero;
 		
@@ -154,9 +154,9 @@ public partial class IntroSequence : AnimationSequence
 		// arrow2.Owner = GetTree().EditedSceneRoot;
 		arrow2.nodeThatTailFollows = scissorsText;
 		arrow2.nodeThatHeadFollows = paperText;
-		arrow2.width = 3;
-		arrow2.headPadding = 2;
-		arrow2.tailPadding = 2.5f;
+		arrow2.Chonk = 3;
+		arrow2.HeadPadding = 2;
+		arrow2.TailPadding = 2.5f;
 		arrow2.Update();
 		arrow2.Scale = Vector3.Zero;
 		
@@ -165,9 +165,9 @@ public partial class IntroSequence : AnimationSequence
 		// arrow3.Owner = GetTree().EditedSceneRoot;
 		arrow3.nodeThatTailFollows = paperText;
 		arrow3.nodeThatHeadFollows = rockText;
-		arrow3.width = 3;
-		arrow3.headPadding = 1.5f;
-		arrow3.tailPadding = 1f;
+		arrow3.Chonk = 3;
+		arrow3.HeadPadding = 1.5f;
+		arrow3.TailPadding = 1f;
 		arrow3.Update();
 		arrow3.Scale = Vector3.Zero;
 		#endregion

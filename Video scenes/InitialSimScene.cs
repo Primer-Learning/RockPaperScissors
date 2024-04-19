@@ -196,26 +196,26 @@ public partial class InitialSimScene : AnimationSequence
 
 		#region Graph creation and settings
 
-		var graph = Graph.CreateAsOwnedChild(this);
+		var graph = Graph.CreateInstance();
 		graph.Position = new Vector3(-21, -2, 0);
 		graph.XAxis.length = 18;
-		graph.XAxis.showTicCylinders = false;
-		graph.XAxis.showArrows = false;
-		graph.XAxis.max = 3;
-		graph.XAxis.manualTicks = new List<Axis.TicData>
+		graph.XAxis.ShowTicCylinders = false;
+		graph.XAxis.ShowArrows = false;
+		graph.XAxis.Max = 3;
+		graph.XAxis.ManualTicks = new List<Axis.TicData>
 		{
 			new (1, "Rock"),
 			new (2, "Paper"),
 			new (3, "Scissors")
 		};
-		graph.XAxis.Thiccness = 4;
-		graph.XAxis.showRod = false;
+		graph.XAxis.Chonk = 4;
+		graph.XAxis.ShowRod = false;
 		// graph.XAxis.Visible = false;
 		
-		graph.YAxis.max = 100;
-		graph.YAxis.ticStep = 100;
+		graph.YAxis.Max = 100;
+		graph.YAxis.TicStep = 100;
 		graph.YAxis.length = 18;
-		graph.YAxis.Thiccness = 4;
+		graph.YAxis.Chonk = 4;
 		graph.YAxis.Visible = false;
 		graph.ZAxis.Visible = false;
 		graph.ZAxis.length = 0;
