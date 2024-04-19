@@ -197,6 +197,8 @@ public partial class InitialSimScene : AnimationSequence
 		#region Graph creation and settings
 
 		var graph = Graph.CreateInstance();
+		AddChild(graph);
+		graph.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
 		graph.Position = new Vector3(-21, -2, 0);
 		graph.XAxis.length = 18;
 		graph.XAxis.ShowTicCylinders = false;
@@ -219,6 +221,7 @@ public partial class InitialSimScene : AnimationSequence
 		graph.YAxis.Visible = false;
 		graph.ZAxis.Visible = false;
 		graph.ZAxis.length = 0;
+		graph.Transition();
 		
 		#endregion
 		
