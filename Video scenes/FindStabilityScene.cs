@@ -21,7 +21,7 @@ public partial class FindStabilityScene : AnimationSequence
 		}
 		RegisterAnimation(simAnimators.Select(x => x.AnimateAppearance()).RunInParallel());
 		// RegisterAnimation(simAnimators.Select(x => x.MakeTreesAndHomesAndAnimateAppearance()).RunInParallel());
-		RegisterAnimation(simAnimators.Select(x => x.ternaryGraph.ScaleTo(20)).RunInParallel());
+		RegisterAnimation(simAnimators.Select(x => x.TernaryGraph.ScaleTo(20)).RunInParallel());
 		RegisterAnimation(simAnimators.Select(x => x.AnimateAllDays()).RunInParallel());
 	}
   
@@ -50,9 +50,9 @@ public partial class FindStabilityScene : AnimationSequence
 		
 		simAnimator.Ground.Position = new Vector3(15, 0, 0);
 
-		simAnimator.SetUpTernaryPlot();
-		simAnimator.ternaryGraph.Scale = Vector3.Zero;
-		simAnimator.ternaryGraph.Position = Vector3.Left * 22;
+		simAnimator.SetUpTernaryPlot(makeTernaryPoint: true);
+		simAnimator.TernaryGraph.Scale = Vector3.Zero;
+		simAnimator.TernaryGraph.Position = Vector3.Left * 22;
 
 		return simAnimator;
 	}

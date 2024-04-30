@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Godot;
-using Primer;
+using PrimerAssets;
 using PrimerTools;
 using PrimerTools.Graph;
 
@@ -212,7 +212,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
 
     private Animation GraphAnimationToDay(int dayCount)
     {
-        if (ternaryGraph != null)
+        if (TernaryGraph != null)
         {
             return AnimateTernaryPlotToDay(dayCount);
         }
@@ -225,39 +225,107 @@ public partial class EvoGameTheorySimAnimator : Node3D
         return new Animation(); // Instead of null
     }
     
-    public TernaryGraph ternaryGraph;
+    public TernaryGraph TernaryGraph;
     private CurvePlot2D plot;
-    public TernaryGraph SetUpTernaryPlot()
+    public MeshInstance3D TernaryPoint;
+    public TernaryGraph SetUpTernaryPlot(bool makeTernaryPoint = false)
     {
-        if (ternaryGraph != null) return ternaryGraph;
-        ternaryGraph = new TernaryGraph();
-        ternaryGraph.Name = "Ternary Graph";
-        AddChild(ternaryGraph);
-        ternaryGraph.Owner = GetTree().EditedSceneRoot;
-        ternaryGraph.Scale = Vector3.One * 10;
-        ternaryGraph.Position = Vector3.Left * 11;
-        ternaryGraph.LabelStrings = new [] {"Rock", "Paper", "Scissors"};
-        ternaryGraph.Colors = new []
+        if (TernaryGraph != null) return TernaryGraph;
+        TernaryGraph = new TernaryGraph();
+        TernaryGraph.Name = "Ternary Graph";
+        AddChild(TernaryGraph);
+        TernaryGraph.Owner = GetTree().EditedSceneRoot;
+        TernaryGraph.Scale = Vector3.One * 10;
+        TernaryGraph.Position = Vector3.Left * 11;
+        TernaryGraph.LabelStrings = new [] {"Rock", "Paper", "Scissors"};
+        TernaryGraph.Colors = new []
         {
             StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
             StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
             StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
         };
-        ternaryGraph.CreateBounds();
+        TernaryGraph.CreateBounds();
         
         plot = new CurvePlot2D();
-        ternaryGraph.AddChild(plot);
+        TernaryGraph.AddChild(plot);
         plot.Owner = GetTree().EditedSceneRoot;
         plot.Width = 10;
 
-        return ternaryGraph;
+        if (makeTernaryPoint)
+        {
+            TernaryPoint = new MeshInstance3D();
+            var sphereMesh = new SphereMesh();
+            sphereMesh.Height = 0.06f;
+            sphereMesh.Radius = 0.03f;
+            var mat = new StandardMaterial3D();
+            sphereMesh.SurfaceSetMaterial(0, mat);
+            TernaryPoint.Mesh = sphereMesh;
+            TernaryGraph.AddChild(TernaryPoint);
+            TernaryPoint.Name = "Ternary point";
+            TernaryPoint.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+            TernaryPoint.Scale = Vector3.Zero;
+        }
+
+        return TernaryGraph;
     }
     public Animation AnimateTernaryPlotToDay(int dayIndex)
     {
-        plot.SetData(Sim.GetStrategyFrequenciesByDay().Take(dayIndex + 1)
-            .Select(population => TernaryGraph.CoordinatesToPosition(population.X, population.Y, population.Z)).ToArray());
+        var animations = new List<Animation>();
+
+        var dataUpToDay = Sim.GetStrategyFrequenciesByDay().Take(dayIndex + 1)
+            .ToArray();
         
-        return plot.Transition(0.5f);
+        plot.SetData(dataUpToDay.Select(TernaryGraph.CoordinatesToPosition).ToArray());
+        animations.Add(plot.Transition());
+
+        if (TernaryPoint != null)
+        {
+            if (TernaryPoint.Scale == Vector3.Zero)
+            {
+                // If scale is zero, just make it appear in place as the correct color
+                TernaryPoint.Position = TernaryGraph.CoordinatesToPosition(dataUpToDay[^1]);
+                ((StandardMaterial3D)TernaryPoint.Mesh.SurfaceGetMaterial(0)).AlbedoColor =
+                    PrimerColor.MixColorsByWeight(
+                        new[]
+                        {
+                            StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
+                            StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+                            StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
+                        },
+                        new[]
+                        {
+                            dataUpToDay[^1].X,
+                            dataUpToDay[^1].Y,
+                            dataUpToDay[^1].Z
+                        }
+                    );
+                animations.Add(TernaryPoint.ScaleTo(1));
+            }
+            else
+            {
+                // Otherwise, animate position and color change
+                animations.Add(TernaryPoint.MoveTo(TernaryGraph.CoordinatesToPosition(dataUpToDay[^1])));
+                animations.Add(TernaryPoint.AnimateColorRgb(
+                        PrimerColor.MixColorsByWeight(
+                            new[]
+                            {
+                                StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
+                                StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+                                StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
+                            },
+                            new[]
+                            {
+                                dataUpToDay[^1].X,
+                                dataUpToDay[^1].Y,
+                                dataUpToDay[^1].Z
+                            }
+                        )
+                    )
+                );
+            }
+        }
+        
+        return animations.RunInParallel();
     }
 
     public BarPlot BarPlot;

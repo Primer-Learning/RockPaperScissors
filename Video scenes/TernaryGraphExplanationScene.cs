@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using System.Linq;
-using Primer;
+using PrimerAssets;
 using PrimerTools;
 using PrimerTools.AnimationSequence;
 using PrimerTools.Graph;
@@ -160,7 +160,7 @@ public partial class TernaryGraphExplanationScene : AnimationSequence
 
         var allPaperPoint = ExamplePoint(EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper]);
         cartesianGraph.AddChild(allPaperPoint);
-        // allPaperPoint.Owner = GetTree().EditedSceneRoot;
+        allPaperPoint.Owner = GetTree().EditedSceneRoot;
         allPaperPoint.Position = cartesianGraph.DataSpaceToPositionSpace(new Vector3(1, 0, 0));
 		RegisterAnimation(allPaperPoint.ScaleTo(1));
 		var allPaperArrow = ExamplePointArrow(allPaperPoint, 45);
@@ -181,23 +181,39 @@ public partial class TernaryGraphExplanationScene : AnimationSequence
 		allScissorsLabelParent.Position = new Vector3(0.534f, 1.123f, 0);
 		allScissorsLabelParent.Scale = Vector3.One * 0.04f;
 		RegisterAnimation(allScissorsLabelGroup.AllLabels.Select(x => x.ScaleTo(1)).RunInParallel());
+		
+		// 0, 0
+		var allRockPoint = ExamplePoint(EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock]);
+		cartesianGraph.AddChild(allRockPoint);
+		// allRockPoint.Owner = GetTree().EditedSceneRoot;
+		allRockPoint.Position = cartesianGraph.DataSpaceToPositionSpace(new Vector3(0f, 0f, 0));
+		RegisterAnimation(allRockPoint.ScaleTo(1));
+		var allRockArrow = ExamplePointArrow(allRockPoint, 150);
+		RegisterAnimation(allRockArrow.ScaleUpFromTail());
+		var allRockLabelParent = CoordinateLabelParent(out var allRockLabelGroup, 100, 0, 0);
+		allRockLabelParent.Position = new Vector3(-0.7f, 0.27f, 0);
+		allRockLabelParent.Scale = Vector3.One * 0.04f;
+		RegisterAnimation(allRockLabelGroup.AllLabels.Select(x => x.ScaleTo(1)).RunInParallel());
 
 		var halfScissorsHalfPaperPoint = ExamplePoint(PrimerColor.JuicyInterpolate(
 			EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors],
 			EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
-			0.5f
+			0.5f, 1
 		));
 		cartesianGraph.AddChild(halfScissorsHalfPaperPoint);
-		// halfScissorsHalfPaperPoint.Owner = GetTree().EditedSceneRoot;
+		// halfScissorsHalfPaperPoint.Owner = GetTree().EditedSceneRoot;F
 		halfScissorsHalfPaperPoint.Position = cartesianGraph.DataSpaceToPositionSpace(new Vector3(0.5f, 0.5f, 0));
 		RegisterAnimation(halfScissorsHalfPaperPoint.ScaleTo(1));
 		var halfScissorsHalfPaperArrow = ExamplePointArrow(halfScissorsHalfPaperPoint, 30);
-		RegisterAnimation(halfScissorsHalfPaperArrow.ScaleUpFromTail());
 		var halfScissorsHalfPaperLabelParent = CoordinateLabelParent(out var halfScissorsHalfPaperLabelGroup, 0, 50, 50);
+		halfScissorsHalfPaperArrow.nodeThatTailFollows = halfScissorsHalfPaperLabelGroup.PaperLabel;
+		halfScissorsHalfPaperArrow.TailPadding = 0.08f;
 		halfScissorsHalfPaperLabelParent.Position = new Vector3(1f, 0.722f, 0);
 		halfScissorsHalfPaperLabelParent.Scale = Vector3.One * 0.04f;
+		RegisterAnimation(halfScissorsHalfPaperArrow.ScaleUpFromTail());
 		RegisterAnimation(halfScissorsHalfPaperLabelGroup.AllLabels.Select(x => x.ScaleTo(1)).RunInParallel());
 
+		#region Draw line and move point along it
 		var paperScissorsLine = cartesianGraph.AddLine();
 		paperScissorsLine.SetData(
 			new Vector3(0, 1, 0),
@@ -205,33 +221,190 @@ public partial class TernaryGraphExplanationScene : AnimationSequence
 		);
 		paperScissorsLine.Width = 17;
 		RegisterAnimation(paperScissorsLine.Transition());
-
+		
 		// halfScissorsHalfPaperLabelGroup.PaperNumberLabel.numberSuffix = "\\%";
 		// halfScissorsHalfPaperLabelGroup.ScissorsNumberLabel.numberSuffix = "\\%";
 		RegisterAnimation(
 			halfScissorsHalfPaperPoint.MoveTo(cartesianGraph.DataSpaceToPositionSpace(new Vector3(0.2f, 0.8f, 0))),
+			halfScissorsHalfPaperPoint.AnimateColorHsv(PrimerColor.JuicyInterpolate(
+				EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors],
+				EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+				0.2f, 1
+			)),
 			halfScissorsHalfPaperLabelGroup.PaperNumberLabel.AnimateNumericalExpression(80),
 			halfScissorsHalfPaperLabelGroup.ScissorsNumberLabel.AnimateNumericalExpression(20),
-			halfScissorsHalfPaperArrow.MoveTo(halfScissorsHalfPaperPoint.GlobalPosition)
+			halfScissorsHalfPaperArrow.Transition()
 		);
 		RegisterAnimation(
 			halfScissorsHalfPaperPoint.MoveTo(cartesianGraph.DataSpaceToPositionSpace(new Vector3(0.8f, 0.2f, 0))),
+			halfScissorsHalfPaperPoint.AnimateColorHsv(PrimerColor.JuicyInterpolate(
+				EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors],
+				EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+				0.8f, 1
+			)),
 			halfScissorsHalfPaperLabelGroup.PaperNumberLabel.AnimateNumericalExpression(20),
 			halfScissorsHalfPaperLabelGroup.ScissorsNumberLabel.AnimateNumericalExpression(80),
-			halfScissorsHalfPaperArrow.MoveTo(halfScissorsHalfPaperPoint.GlobalPosition)
+			halfScissorsHalfPaperArrow.Transition()
 		);
 		RegisterAnimation(
 			halfScissorsHalfPaperPoint.MoveTo(cartesianGraph.DataSpaceToPositionSpace(new Vector3(0.5f, 0.5f, 0))),
+			halfScissorsHalfPaperPoint.AnimateColorHsv(PrimerColor.JuicyInterpolate(
+				EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors],
+				EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+				0.5f, 1
+			)),
 			halfScissorsHalfPaperLabelGroup.PaperNumberLabel.AnimateNumericalExpression(50),
 			halfScissorsHalfPaperLabelGroup.ScissorsNumberLabel.AnimateNumericalExpression(50),
-			halfScissorsHalfPaperArrow.MoveTo(halfScissorsHalfPaperPoint.GlobalPosition)
+			halfScissorsHalfPaperArrow.Transition()
 		);
+		#endregion
+		
+		// 0.5, 0
+		var halfRockHalfPaperPoint = ExamplePoint(
+			PrimerColor.JuicyInterpolate(
+				EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
+				EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+				0.5f, 1
+			)
+		);
+		cartesianGraph.AddChild(halfRockHalfPaperPoint);
+		// halfRockHalfPaperPoint.Owner = GetTree().EditedSceneRoot;
+		halfRockHalfPaperPoint.Position = cartesianGraph.DataSpaceToPositionSpace(new Vector3(0.5f, 0f, 0));
+		RegisterAnimation(halfRockHalfPaperPoint.ScaleTo(1));
+		var halfRockHalfPaperArrow = ExamplePointArrow(halfRockHalfPaperPoint, 15);
+		RegisterAnimation(halfRockHalfPaperArrow.ScaleUpFromTail());
+		var halfRockHalfPaperLabelParent = CoordinateLabelParent(out var halfRockHalfPaperLabelGroup, 0, 0, 100);
+		halfRockHalfPaperLabelParent.Position = new Vector3(0.234f, 1.123f, 0);
+		halfRockHalfPaperLabelParent.Scale = Vector3.One * 0.04f;
+		RegisterAnimation(halfRockHalfPaperLabelGroup.AllLabels.Select(x => x.ScaleTo(1)).RunInParallel());
+		
+		// 0, 0.5
+		var halfRockHalfScissorsPoint = ExamplePoint(
+			PrimerColor.JuicyInterpolate(
+				EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
+				EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors],
+				0.5f, 1
+			)
+		);
+		cartesianGraph.AddChild(halfRockHalfScissorsPoint);
+		halfRockHalfScissorsPoint.Owner = GetTree().EditedSceneRoot;
+		halfRockHalfScissorsPoint.Position = cartesianGraph.DataSpaceToPositionSpace(new Vector3(0f, 0.5f, 0));
+		RegisterAnimation(halfRockHalfScissorsPoint.ScaleTo(1));
+		var halfRockHalfScissorsArrow = ExamplePointArrow(halfRockHalfScissorsPoint, 15);
+		RegisterAnimation(halfRockHalfScissorsArrow.ScaleUpFromTail());
+		var halfRockHalfScissorsLabelParent = CoordinateLabelParent(out var halfRockHalfScissorsLabelGroup, 50, 0, 50);
+		halfRockHalfScissorsLabelParent.Position = new Vector3(0.234f, 1.123f, 0);
+		halfRockHalfScissorsLabelParent.Scale = Vector3.One * 0.04f;
+		RegisterAnimation(halfRockHalfScissorsLabelGroup.AllLabels.Select(x => x.ScaleTo(1)).RunInParallel());
+		
+		// // 0.25, 0.25
+		var halfRockQuarterPaperQuarterScissorsPoint = ExamplePoint(
+			PrimerColor.MixColorsByWeight(
+				new Color[]
+				{
+					EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
+					EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+					EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
+				},
+				new float[] { 0.5f, 0.25f, 0.25f }
+			)
+		);
+		cartesianGraph.AddChild(halfRockQuarterPaperQuarterScissorsPoint);
+		// halfRockQuarterPaperQuarterScissorsPoint.Owner = GetTree().EditedSceneRoot;
+		halfRockQuarterPaperQuarterScissorsPoint.Position = cartesianGraph.DataSpaceToPositionSpace(new Vector3(0.25f, 0.25f, 0));
+		RegisterAnimation(halfRockQuarterPaperQuarterScissorsPoint.ScaleTo(1));
+		var halfRockQuarterPaperQuarterScissorsArrow = ExamplePointArrow(halfRockQuarterPaperQuarterScissorsPoint, 15);
+		RegisterAnimation(halfRockQuarterPaperQuarterScissorsArrow.ScaleUpFromTail());
+		var halfRockQuarterPaperQuarterScissorsLabelParent = CoordinateLabelParent(out var halfRockQuarterPaperQuarterScissorsLabelGroup, 0, 0, 100);
+		halfRockQuarterPaperQuarterScissorsLabelParent.Position = new Vector3(0.534f, 1.123f, 0);
+		halfRockQuarterPaperQuarterScissorsLabelParent.Scale = Vector3.One * 0.04f;
+		RegisterAnimation(halfRockQuarterPaperQuarterScissorsLabelGroup.AllLabels.Select(x => x.ScaleTo(1)).RunInParallel());
+		
+		// 0.5, 0.25
+		var quarterRockHalfPaperQuarterScissorsPoint = ExamplePoint(
+			PrimerColor.MixColorsByWeight(
+				new Color[]
+				{
+					EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
+					EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+					EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
+				},
+				new float[] { 0.25f, 0.5f, 0.25f }
+			)
+		);
+		cartesianGraph.AddChild(quarterRockHalfPaperQuarterScissorsPoint);
+		// quarterRockHalfPaperQuarterScissorsPoint.Owner = GetTree().EditedSceneRoot;
+		quarterRockHalfPaperQuarterScissorsPoint.Position = cartesianGraph.DataSpaceToPositionSpace(new Vector3(0.5f, 0.25f, 0));
+		RegisterAnimation(quarterRockHalfPaperQuarterScissorsPoint.ScaleTo(1));
+		var quarterRockHalfPaperQuarterScissorsArrow = ExamplePointArrow(quarterRockHalfPaperQuarterScissorsPoint, 15);
+		RegisterAnimation(quarterRockHalfPaperQuarterScissorsArrow.ScaleUpFromTail());
+		var quarterRockHalfPaperQuarterScissorsLabelParent = CoordinateLabelParent(out var quarterRockHalfPaperQuarterScissorsLabelGroup, 0, 0, 100);
+		quarterRockHalfPaperQuarterScissorsLabelParent.Position = new Vector3(0.534f, 1.123f, 0);
+		quarterRockHalfPaperQuarterScissorsLabelParent.Scale = Vector3.One * 0.04f;
+		RegisterAnimation(quarterRockHalfPaperQuarterScissorsLabelGroup.AllLabels.Select(x => x.ScaleTo(1)).RunInParallel());
+		
+		// 0.5, 0.25
+		var quarterRockQuarterPaperHalfScissorsPoint = ExamplePoint(
+			PrimerColor.MixColorsByWeight(
+				new Color[]
+				{
+					EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
+					EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+					EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
+				},
+				new float[] { 0.25f, 0.25f, 0.5f }
+			)
+			// PrimerColor.JuicyInterpolate(
+			// 	PrimerColor.JuicyInterpolate(
+			// 		EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+			// 		EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
+			// 		0.5f, 1
+			// 	),
+			// 	EvoGameTheorySimAnimator.StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors],
+			// 	0.5f, 1
+			// )
+		);
+		cartesianGraph.AddChild(quarterRockQuarterPaperHalfScissorsPoint);
+		quarterRockQuarterPaperHalfScissorsPoint.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+		// quarterRockQuarterPaperHalfScissorsPoint.Owner = GetTree().EditedSceneRoot;
+		quarterRockQuarterPaperHalfScissorsPoint.Position = cartesianGraph.DataSpaceToPositionSpace(new Vector3(0.25f, 0.5f, 0));
+		RegisterAnimation(quarterRockQuarterPaperHalfScissorsPoint.ScaleTo(1));
+		var quarterRockQuarterPaperHalfScissorsArrow = ExamplePointArrow(quarterRockQuarterPaperHalfScissorsPoint, 15);
+		RegisterAnimation(quarterRockQuarterPaperHalfScissorsArrow.ScaleUpFromTail());
+		var quarterRockQuarterPaperHalfScissorsLabelParent = CoordinateLabelParent(out var quarterRockQuarterPaperHalfScissorsLabelGroup, 0, 0, 100);
+		quarterRockQuarterPaperHalfScissorsLabelParent.Position = new Vector3(0.534f, 1.123f, 0);
+		quarterRockQuarterPaperHalfScissorsLabelParent.Scale = Vector3.One * 0.04f;
+		RegisterAnimation(quarterRockQuarterPaperHalfScissorsLabelGroup.AllLabels.Select(x => x.ScaleTo(1)).RunInParallel());
 
-		// var plot = new CurvePlot2D();
-		// ternaryGraph.AddChild(plot);
-		// plot.Owner = GetTree().EditedSceneRoot;
-		// plot.Width = 10;
+		// paperScissorsLine.TransformPointFromDataSpaceToPositionSpace = TernaryGraph.CoordinatesToPositionButXAndYAreTheOnesThatMatter;
 
+		paperScissorsLine.SetData(
+			paperScissorsLine.GetData().Select(x => TernaryGraph.CoordinatesToPositionButXAndYAreTheOnesThatMatter(x)).ToArray()
+		);
+		RegisterAnimation(
+			AnimationUtilities.Parallel(
+				paperScissorsLine.Transition(),
+				allScissorsPoint.MoveTo(cartesianGraph.DataSpaceToPositionSpace(
+					TernaryGraph.CoordinatesToPosition(0f, 0f, 1f))),
+				allRockPoint.MoveTo(cartesianGraph.DataSpaceToPositionSpace(
+					TernaryGraph.CoordinatesToPosition(1f, 0f, 0f))),
+				allPaperPoint.MoveTo(cartesianGraph.DataSpaceToPositionSpace(
+					TernaryGraph.CoordinatesToPosition(0f, 1f, 0f))),
+				halfRockHalfPaperArrow.MoveTo(cartesianGraph.DataSpaceToPositionSpace(
+					TernaryGraph.CoordinatesToPosition(0.5f, 0.5f, 0f))),
+				halfRockHalfScissorsPoint.MoveTo(cartesianGraph.DataSpaceToPositionSpace(
+					TernaryGraph.CoordinatesToPosition(0.5f, 0f, 0.5f))),
+				halfScissorsHalfPaperPoint.MoveTo(cartesianGraph.DataSpaceToPositionSpace(
+					TernaryGraph.CoordinatesToPosition(0f, 0.5f, 0.5f))),
+				quarterRockHalfPaperQuarterScissorsPoint.MoveTo(cartesianGraph.DataSpaceToPositionSpace(
+					TernaryGraph.CoordinatesToPosition(0.25f, 0.5f, 0.25f))),
+				quarterRockQuarterPaperHalfScissorsPoint.MoveTo(cartesianGraph.DataSpaceToPositionSpace(
+					TernaryGraph.CoordinatesToPosition(0.25f, 0.25f, 0.5f))),
+				halfRockQuarterPaperQuarterScissorsPoint.MoveTo(cartesianGraph.DataSpaceToPositionSpace(
+					TernaryGraph.CoordinatesToPosition(0.5f, 0.25f, 0.25f))),
+				cartesianGraph.YAxis.RotateTo(new Vector3(0, 0, 60))
+			)
+		);
 	}
 
 	private class RPSLabelGroup

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using Godot;
 using PrimerTools;
 using System.Linq;
-using Primer;
+using PrimerAssets;
 using EntityID = System.Int32;
 using ParentID = System.Int32;
 

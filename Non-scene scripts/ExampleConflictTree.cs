@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel;
 using Godot;
-using Primer;
+using PrimerAssets;
 using PrimerTools;
 
 public class ExampleConflictTree

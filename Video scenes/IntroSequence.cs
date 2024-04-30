@@ -1,5 +1,5 @@
 using Godot;
-using Primer;
+using PrimerAssets;
 using PrimerTools;
 using PrimerTools.AnimationSequence;
 using PrimerTools.LaTeX;
@@ -146,7 +146,7 @@ public partial class IntroSequence : AnimationSequence
 		arrow1.Chonk = 3;
 		arrow1.HeadPadding = 1f;
 		arrow1.TailPadding = 1.5f;
-		arrow1.Update();
+		arrow1.Transition();
 		arrow1.Scale = Vector3.Zero;
 		
 		var arrow2 = Arrow.ArrowScene.Instantiate<Arrow>();
@@ -157,7 +157,7 @@ public partial class IntroSequence : AnimationSequence
 		arrow2.Chonk = 3;
 		arrow2.HeadPadding = 2;
 		arrow2.TailPadding = 2.5f;
-		arrow2.Update();
+		arrow2.Transition();
 		arrow2.Scale = Vector3.Zero;
 		
 		var arrow3 = Arrow.ArrowScene.Instantiate<Arrow>();
@@ -168,7 +168,7 @@ public partial class IntroSequence : AnimationSequence
 		arrow3.Chonk = 3;
 		arrow3.HeadPadding = 1.5f;
 		arrow3.TailPadding = 1f;
-		arrow3.Update();
+		arrow3.Transition();
 		arrow3.Scale = Vector3.Zero;
 		#endregion
 		
