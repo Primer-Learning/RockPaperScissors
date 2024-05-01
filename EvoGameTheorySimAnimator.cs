@@ -138,7 +138,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
                         AnimationUtilities.Parallel(
                             blob.MoveTo(pos, duration: 0),
                             blob.ScaleTo(Vector3.One * 0.1f),
-                            blob.AnimateColor(StrategyColors[Sim.Registry.Strategies[entityId]])
+                            blob.AnimateColorHsv(StrategyColors[Sim.RpsGame.StrategyOptions[Sim.Registry.Strategies[entityId]]])
                         )
                     );
                 }
@@ -227,7 +227,9 @@ public partial class EvoGameTheorySimAnimator : Node3D
     
     public TernaryGraph TernaryGraph;
     private CurvePlot2D plot;
-    public MeshInstance3D TernaryPoint;
+    private Blob ternaryPoint;
+    private float ternaryPointScale = 0.05f;
+    private Vector3 TernaryPointOffset => new Vector3(0, -ternaryPointScale / 2, 0.015f); 
     public TernaryGraph SetUpTernaryPlot(bool makeTernaryPoint = false)
     {
         if (TernaryGraph != null) return TernaryGraph;
@@ -253,17 +255,19 @@ public partial class EvoGameTheorySimAnimator : Node3D
 
         if (makeTernaryPoint)
         {
-            TernaryPoint = new MeshInstance3D();
-            var sphereMesh = new SphereMesh();
-            sphereMesh.Height = 0.06f;
-            sphereMesh.Radius = 0.03f;
-            var mat = new StandardMaterial3D();
-            sphereMesh.SurfaceSetMaterial(0, mat);
-            TernaryPoint.Mesh = sphereMesh;
-            TernaryGraph.AddChild(TernaryPoint);
-            TernaryPoint.Name = "Ternary point";
-            TernaryPoint.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
-            TernaryPoint.Scale = Vector3.Zero;
+            // TernaryPoint = new MeshInstance3D();
+            // var sphereMesh = new SphereMesh();
+            // sphereMesh.Height = 0.06f;
+            // sphereMesh.Radius = 0.03f;
+            // var mat = new StandardMaterial3D();
+            // sphereMesh.SurfaceSetMaterial(0, mat);
+            // TernaryPoint.Mesh = sphereMesh;
+            ternaryPoint = Blob.BlobScene.Instantiate<Blob>();
+            // TernaryPoint.SetAnimationTreeCondition("smile", "blob_mouth_state_machine", true, false);
+            TernaryGraph.AddChild(ternaryPoint);
+            ternaryPoint.Name = "Ternary point";
+            ternaryPoint.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
+            ternaryPoint.Scale = Vector3.Zero;
         }
 
         return TernaryGraph;
@@ -278,50 +282,37 @@ public partial class EvoGameTheorySimAnimator : Node3D
         plot.SetData(dataUpToDay.Select(TernaryGraph.CoordinatesToPosition).ToArray());
         animations.Add(plot.Transition());
 
-        if (TernaryPoint != null)
+        if (ternaryPoint != null)
         {
-            if (TernaryPoint.Scale == Vector3.Zero)
+            var newPosition = TernaryGraph.CoordinatesToPosition(dataUpToDay[^1]) + TernaryPointOffset;
+            var newColor = PrimerColor.MixColorsByWeight(
+                new[]
+                {
+                    StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
+                    StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
+                    StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
+                },
+                new[]
+                {
+                    dataUpToDay[^1].X,
+                    dataUpToDay[^1].Y,
+                    dataUpToDay[^1].Z
+                }
+            );
+            
+            if (ternaryPoint.Scale == Vector3.Zero)
             {
                 // If scale is zero, just make it appear in place as the correct color
-                TernaryPoint.Position = TernaryGraph.CoordinatesToPosition(dataUpToDay[^1]);
-                ((StandardMaterial3D)TernaryPoint.Mesh.SurfaceGetMaterial(0)).AlbedoColor =
-                    PrimerColor.MixColorsByWeight(
-                        new[]
-                        {
-                            StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
-                            StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
-                            StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
-                        },
-                        new[]
-                        {
-                            dataUpToDay[^1].X,
-                            dataUpToDay[^1].Y,
-                            dataUpToDay[^1].Z
-                        }
-                    );
-                animations.Add(TernaryPoint.ScaleTo(1));
+                ternaryPoint.Position = newPosition;
+                // ((StandardMaterial3D)TernaryPoint.Mesh.SurfaceGetMaterial(0)).AlbedoColor =
+                ternaryPoint.SetColor(newColor);
+                animations.Add(ternaryPoint.ScaleTo(ternaryPointScale));
             }
             else
             {
                 // Otherwise, animate position and color change
-                animations.Add(TernaryPoint.MoveTo(TernaryGraph.CoordinatesToPosition(dataUpToDay[^1])));
-                animations.Add(TernaryPoint.AnimateColorRgb(
-                        PrimerColor.MixColorsByWeight(
-                            new[]
-                            {
-                                StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Rock],
-                                StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Paper],
-                                StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
-                            },
-                            new[]
-                            {
-                                dataUpToDay[^1].X,
-                                dataUpToDay[^1].Y,
-                                dataUpToDay[^1].Z
-                            }
-                        )
-                    )
-                );
+                animations.Add(ternaryPoint.MoveTo(newPosition));
+                animations.Add(ternaryPoint.AnimateColorRgb(newColor));
             }
         }
         

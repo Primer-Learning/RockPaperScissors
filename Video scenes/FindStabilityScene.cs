@@ -31,12 +31,13 @@ public partial class FindStabilityScene : AnimationSequence
 		var sim = new EvoGameTheorySim();
 		sim.RpsGame = new EvoGameTheorySim.RPSGame(
 			winMagnitude: 1f,
-			tieCost: 1
+			tieCost: 0f
 		);
-		sim.InitialAlleleFrequencies = new[] { 5f, 1f, 1f };
+		sim.InitialAlleleFrequencies = new[] { 2f, 1f, 1f };
 		AddChild(sim);
 		sim.NumDays = 200;
 		sim.InitialBlobCount = 400;
+		sim.MutationRate = 0.001f;
 		sim.NumTrees = 400;
 		sim.Seed = seed;
 		sim.RunSim();

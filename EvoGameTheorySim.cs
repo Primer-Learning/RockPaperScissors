@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Godot;
 using PrimerTools;
 using System.Linq;
-using PrimerAssets;
 using EntityID = System.Int32;
 using ParentID = System.Int32;
+using StrategyID = System.Int32;
 
 [Tool]
 public partial class EvoGameTheorySim : Node
@@ -37,10 +36,10 @@ public partial class EvoGameTheorySim : Node
 	public class EntityRegistry
 	{
 		private EntityID _nextId;
-		public readonly List<RPSGame.Strategy> Strategies = new();
+		public readonly List<StrategyID> Strategies = new();
 		public readonly List<ParentID> Parents = new();
 
-		public EntityID CreateBlob(RPSGame.Strategy strategy, EntityID parent)
+		public EntityID CreateBlob(StrategyID strategy, EntityID parent)
 		{
 			var id = _nextId++;
 			Strategies.Add(strategy);
@@ -54,8 +53,8 @@ public partial class EvoGameTheorySim : Node
 	{
 		public RPSGame(float winMagnitude, float tieCost)
 		{
-			WinMagnitude = winMagnitude;
-			TieCost = tieCost;
+			this.winMagnitude = winMagnitude;
+			this.tieCost = tieCost;
 		}
 		public RPSGame(){ GD.PushWarning("Creating default RPSGame.");}
 		
@@ -65,20 +64,22 @@ public partial class EvoGameTheorySim : Node
 			Paper,
 			Scissors
 		}
+
+		public Strategy[] StrategyOptions = Enum.GetValues<Strategy>();
 		
-		public (float reward1, float reward2) GetRewards(Strategy strategy1, Strategy strategy2)
+		public (float reward1, float reward2) GetRewards(int strategy1, int strategy2)
 		{
-			return (RewardMatrix[(int)strategy1, (int)strategy2], RewardMatrix[(int)strategy2, (int)strategy1] - GlobalCost);
+			return (RewardMatrix[strategy1, strategy2] - GlobalCost, RewardMatrix[strategy2, strategy1] - GlobalCost);
 		}
 		
 		private const float GlobalCost = 0.0f;
 		
-		public float WinMagnitude = 1f;
-		public float TieCost = 0.0f;
+		private readonly float winMagnitude = 1f;
+		private readonly float tieCost = 0.0f;
 		private float[,] RewardMatrix => new float[3, 3] {
-			{ 1 - TieCost, 1 - WinMagnitude, 1 + 1 * WinMagnitude }, // Rock rewards
-			{ 1 + WinMagnitude, 1 - TieCost, 1 - WinMagnitude }, // Paper rewards   
-			{ 1 - WinMagnitude, 1 + WinMagnitude, 1 - TieCost}  // Scissors rewards
+			{ 1 - tieCost, 1 - winMagnitude, 1 + 1 * winMagnitude }, // Rock rewards
+			{ 1 + winMagnitude, 1 - tieCost, 1 - winMagnitude }, // Paper rewards   
+			{ 1 - winMagnitude, 1 + winMagnitude, 1 - tieCost}  // Scissors rewards
 		};
 	}
 	
@@ -88,6 +89,7 @@ public partial class EvoGameTheorySim : Node
 	public int NumDays = 20;
 	public int InitialBlobCount = 32;
 	public int NumTrees = 50;
+	public float MutationRate = 0;
 	public float[] InitialAlleleFrequencies;
 	#endregion
 
@@ -114,12 +116,11 @@ public partial class EvoGameTheorySim : Node
         EntitiesByDay = new List<EntityID>[NumDays + 1];
      	
      	var blobIDs = new List<EntityID>();
-        var strats = Enum.GetValues<RPSGame.Strategy>();
         var currentStratIndex = -1;
         var currentStratTargetTotal = 0;
         for (var i = 0; i < InitialBlobCount; i++)
         {
-	        // while here so we skip alleles with zero initial frequencies
+	        // while loop is here so we skip alleles with zero initial frequencies
 	        while (i >= currentStratTargetTotal)
 	        {
 		        if (InitialAlleleFrequencies.Length == currentStratIndex + 1) break; // Prevent incrementing too far.
@@ -128,7 +129,7 @@ public partial class EvoGameTheorySim : Node
 	        }
      		
      		blobIDs.Add(Registry.CreateBlob(
-     			strats[currentStratIndex],
+     			currentStratIndex,
      			-1
      		));
      	}
@@ -149,27 +150,17 @@ public partial class EvoGameTheorySim : Node
 			for (var j = 0; j < numGames * 2; j += 2)
 			{
 				var parent1Strategy = Registry.Strategies[shuffledParents[j]];
-				var parent2Stategy = Registry.Strategies[shuffledParents[j+1]];
+				var parent2Strategy = Registry.Strategies[shuffledParents[j+1]];
 				
-				var (reward1, reward2) = RpsGame.GetRewards(parent1Strategy, parent2Stategy);
+				var (reward1, reward2) = RpsGame.GetRewards(parent1Strategy, parent2Strategy);
 				
 				for (var k = 0; k < GetOffspringCount(reward1); k++)
 				{
-					dailyChildren.Add(
-						Registry.CreateBlob(
-							parent1Strategy,
-							shuffledParents[j]
-						)
-					);
+					dailyChildren.Add(Reproduce(shuffledParents[j], parent1Strategy));
 				}
 				for (var k = 0; k < GetOffspringCount(reward2); k++)
 				{
-					dailyChildren.Add(
-						Registry.CreateBlob(
-							parent2Stategy,
-							shuffledParents[j]
-						)
-					);
+					dailyChildren.Add(Reproduce(shuffledParents[j], parent2Strategy));
 				}
 			}
 
@@ -178,18 +169,8 @@ public partial class EvoGameTheorySim : Node
 				if (numGames < NumTrees)
 				{
 					var parentStrategy = Registry.Strategies[shuffledParents[j]];
-					dailyChildren.Add(
-						Registry.CreateBlob(
-							parentStrategy,
-							shuffledParents[j]
-						)
-					);
-					dailyChildren.Add(
-						Registry.CreateBlob(
-							parentStrategy,
-							shuffledParents[j]
-						)
-					);
+					dailyChildren.Add(Reproduce(shuffledParents[j], parentStrategy));
+					dailyChildren.Add(Reproduce(shuffledParents[j], parentStrategy));
 				}
 				// Else they die, which is just not reproducing, so do nothing
 			}
@@ -197,6 +178,23 @@ public partial class EvoGameTheorySim : Node
 			// Shuffle at the end of the loop so entities are sorted by tree for the next day
 			EntitiesByDay[i] = dailyChildren.ShuffleToList(rng: _rng);
 		}
+	}
+
+	private int Reproduce(int parentIndex, int strategy)
+	{
+		if (_rng.RangeFloat(1) < MutationRate / 2)
+		{
+			strategy = (strategy + 1) % RpsGame.StrategyOptions.Length;
+		}
+		else if (_rng.RangeFloat(1) < MutationRate)
+		{
+			strategy = (strategy + 2) % RpsGame.StrategyOptions.Length;
+		}
+		
+		return Registry.CreateBlob(
+			strategy,
+			parentIndex
+		);
 	}
 	private int GetOffspringCount(float reward)
 	{
@@ -222,9 +220,9 @@ public partial class EvoGameTheorySim : Node
 		foreach (var (day, entitiesToday) in EntitiesByDay.WithIndex())
 		{
 			GD.Print($"Day {day} total: {entitiesToday.Count}");
-			var fractionRock = entitiesToday.Count(s => Registry.Strategies[s] == RPSGame.Strategy.Rock) / (float)entitiesToday.Count;
-			var fractionPaper = entitiesToday.Count(s => Registry.Strategies[s] == RPSGame.Strategy.Paper) / (float)entitiesToday.Count;
-			var fractionScissors = entitiesToday.Count(s => Registry.Strategies[s] == RPSGame.Strategy.Scissors) / (float)entitiesToday.Count;
+			var fractionRock = entitiesToday.Count(s => Registry.Strategies[s] == 0) / (float)entitiesToday.Count;
+			var fractionPaper = entitiesToday.Count(s => Registry.Strategies[s] == 1) / (float)entitiesToday.Count;
+			var fractionScissors = entitiesToday.Count(s => Registry.Strategies[s] == 2) / (float)entitiesToday.Count;
 			// Print the fractions formatted to two decimal places
 			GD.Print($"Rock: {fractionRock:P1}, Paper: {fractionPaper:P1}, Scissors: {fractionScissors:P1}");
 		}
@@ -234,9 +232,9 @@ public partial class EvoGameTheorySim : Node
 		var frequencies = new Vector3[NumDays + 1];
 		foreach (var (day, entitiesToday) in EntitiesByDay.WithIndex())
 		{
-			var fractionRock = entitiesToday.Count(s => Registry.Strategies[s] == RPSGame.Strategy.Rock) / (float)entitiesToday.Count;
-			var fractionPaper = entitiesToday.Count(s => Registry.Strategies[s] == RPSGame.Strategy.Paper) / (float)entitiesToday.Count;
-			var fractionScissors = entitiesToday.Count(s => Registry.Strategies[s] == RPSGame.Strategy.Scissors) / (float)entitiesToday.Count;
+			var fractionRock = entitiesToday.Count(s => Registry.Strategies[s] == 0) / (float)entitiesToday.Count;
+			var fractionPaper = entitiesToday.Count(s => Registry.Strategies[s] == 1) / (float)entitiesToday.Count;
+			var fractionScissors = entitiesToday.Count(s => Registry.Strategies[s] == 2) / (float)entitiesToday.Count;
 			frequencies[day] = new Vector3(fractionRock, fractionPaper, fractionScissors);
 		}
 		return frequencies;
