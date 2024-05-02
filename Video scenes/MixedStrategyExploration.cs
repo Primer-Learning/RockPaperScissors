@@ -50,7 +50,7 @@ public partial class MixedStrategyExploration : AnimationSequence
 		
         simAnimator.Ground.Position = new Vector3(15, 0, 0);
 
-        simAnimator.SetUpTernaryPlot(makeTernaryPoint: true);
+        simAnimator.SetUpTernaryPlot(makeCurve: false, makeBars: true);
         simAnimator.TernaryGraph.Scale = Vector3.Zero;
         simAnimator.TernaryGraph.Position = Vector3.Left * 22;
 

@@ -8,6 +8,7 @@ using PrimerTools.Graph;
 public partial class EvoGameTheorySimAnimator : Node3D
 {
     public bool AnimateBlobs = true;
+    public bool hasBars = false;
     
     public EvoGameTheorySim Sim;
     public MeshInstance3D Ground;
@@ -134,11 +135,18 @@ public partial class EvoGameTheorySimAnimator : Node3D
 
                     var parent = Sim.Registry.Parents[entityId];
                     var pos = parent == -1 ? _homes[_simVisualizationRng.RangeInt(_homes.Count)].Position : parentPositions[parent];
+
+                    // Make a color by mixing the colors of each allele with equal weights
+                    var color = PrimerColor.MixColorsByWeight(
+                            Sim.Registry.Strategies[entityId].Select(x => StrategyColors[(EvoGameTheorySim.RPSGame.Strategy)x]).ToArray(),
+                            Enumerable.Repeat(1f, Sim.NumAllelesPerBlob).ToArray()
+                    );
+                    
                     appearanceAnimations.Add(
                         AnimationUtilities.Parallel(
                             blob.MoveTo(pos, duration: 0),
                             blob.ScaleTo(Vector3.One * 0.1f),
-                            blob.AnimateColorHsv(StrategyColors[Sim.RpsGame.StrategyOptions[Sim.Registry.Strategies[entityId]]])
+                            blob.AnimateColorHsv(color)
                         )
                     );
                 }
@@ -230,10 +238,20 @@ public partial class EvoGameTheorySimAnimator : Node3D
     private Blob ternaryPoint;
     private float ternaryPointScale = 0.05f;
     private Vector3 TernaryPointOffset => new Vector3(0, -ternaryPointScale / 2, 0.015f); 
-    public TernaryGraph SetUpTernaryPlot(bool makeTernaryPoint = false)
+    public TernaryGraph SetUpTernaryPlot(bool makeTernaryPoint = false, bool makeCurve = true, bool makeBars = false)
     {
         if (TernaryGraph != null) return TernaryGraph;
-        TernaryGraph = new TernaryGraph();
+
+        hasBars = makeBars;
+        if (hasBars)
+        {
+            TernaryGraph = new TernaryGraphWithBars();
+        }
+        else
+        {
+            TernaryGraph = new TernaryGraph();
+        }
+        
         TernaryGraph.Name = "Ternary Graph";
         AddChild(TernaryGraph);
         TernaryGraph.Owner = GetTree().EditedSceneRoot;
@@ -247,11 +265,14 @@ public partial class EvoGameTheorySimAnimator : Node3D
             StrategyColors[EvoGameTheorySim.RPSGame.Strategy.Scissors]
         };
         TernaryGraph.CreateBounds();
-        
-        plot = new CurvePlot2D();
-        TernaryGraph.AddChild(plot);
-        plot.Owner = GetTree().EditedSceneRoot;
-        plot.Width = 10;
+
+        if (makeCurve)
+        {
+            plot = new CurvePlot2D();
+            TernaryGraph.AddChild(plot);
+            plot.Owner = GetTree().EditedSceneRoot;
+            plot.Width = 10;
+        }
 
         if (makeTernaryPoint)
         {
@@ -269,6 +290,8 @@ public partial class EvoGameTheorySimAnimator : Node3D
             ternaryPoint.MakeSelfAndChildrenLocal(GetTree().EditedSceneRoot);
             ternaryPoint.Scale = Vector3.Zero;
         }
+        
+        if (hasBars) ((TernaryGraphWithBars) TernaryGraph).AddBars();
 
         return TernaryGraph;
     }
@@ -278,9 +301,12 @@ public partial class EvoGameTheorySimAnimator : Node3D
 
         var dataUpToDay = Sim.GetStrategyFrequenciesByDay().Take(dayIndex + 1)
             .ToArray();
-        
-        plot.SetData(dataUpToDay.Select(TernaryGraph.CoordinatesToPosition).ToArray());
-        animations.Add(plot.Transition());
+
+        if (plot != null)
+        {
+            plot.SetData(dataUpToDay.Select(TernaryGraph.CoordinatesToPosition).ToArray());
+            animations.Add(plot.Transition());
+        }
 
         if (ternaryPoint != null)
         {
@@ -314,6 +340,11 @@ public partial class EvoGameTheorySimAnimator : Node3D
                 animations.Add(ternaryPoint.MoveTo(newPosition));
                 animations.Add(ternaryPoint.AnimateColorRgb(newColor));
             }
+        }
+
+        if (TernaryGraph is TernaryGraphWithBars graphWithBars)
+        {
+            // graphWithBars.Data = 
         }
         
         return animations.RunInParallel();

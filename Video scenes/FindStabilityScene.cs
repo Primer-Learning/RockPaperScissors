@@ -37,8 +37,9 @@ public partial class FindStabilityScene : AnimationSequence
 		AddChild(sim);
 		sim.NumDays = 200;
 		sim.InitialBlobCount = 400;
-		sim.MutationRate = 0.001f;
+		sim.MutationRate = 0.01f;
 		sim.NumTrees = 400;
+		sim.NumAllelesPerBlob = 1;
 		sim.Seed = seed;
 		sim.RunSim();
 
