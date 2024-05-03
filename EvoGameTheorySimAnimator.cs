@@ -8,7 +8,7 @@ using PrimerTools.Graph;
 public partial class EvoGameTheorySimAnimator : Node3D
 {
     public bool AnimateBlobs = true;
-    public bool hasBars = false;
+    public bool HasBars = false;
     
     public EvoGameTheorySim Sim;
     public MeshInstance3D Ground;
@@ -242,10 +242,11 @@ public partial class EvoGameTheorySimAnimator : Node3D
     {
         if (TernaryGraph != null) return TernaryGraph;
 
-        hasBars = makeBars;
-        if (hasBars)
+        HasBars = makeBars;
+        if (HasBars)
         {
             TernaryGraph = new TernaryGraphWithBars();
+            ((TernaryGraphWithBars)TernaryGraph).BarsPerSide = Sim.NumAllelesPerBlob + 1;
         }
         else
         {
@@ -291,7 +292,7 @@ public partial class EvoGameTheorySimAnimator : Node3D
             ternaryPoint.Scale = Vector3.Zero;
         }
         
-        if (hasBars) ((TernaryGraphWithBars) TernaryGraph).AddBars();
+        if (HasBars) ((TernaryGraphWithBars) TernaryGraph).AddBars();
 
         return TernaryGraph;
     }
@@ -344,7 +345,8 @@ public partial class EvoGameTheorySimAnimator : Node3D
 
         if (TernaryGraph is TernaryGraphWithBars graphWithBars)
         {
-            // graphWithBars.Data = 
+            graphWithBars.Data = Sim.GetMixedStrategyFreqenciesByDay().Take(dayIndex + 1).ToArray()[^1].ToArray();
+            animations.Add(graphWithBars.Transition());
         }
         
         return animations.RunInParallel();

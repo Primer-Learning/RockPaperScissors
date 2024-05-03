@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Godot;
 using PrimerTools;
 using System.Linq;
+using PrimerTools.Graph;
 using EntityID = System.Int32;
 using ParentID = System.Int32;
 using StrategyID = System.Int32;
@@ -295,4 +296,32 @@ public partial class EvoGameTheorySim : Node
 
 		return frequencies;
 	}
+
+	public List<List<float>> GetMixedStrategyFreqenciesByDay()
+	{
+		var frequenciesByDay = new List<List<float>>();
+		foreach (var (day, entitiesToday) in EntitiesByDay.WithIndex())
+		{
+			var frequenciesToday = new List<float>();
+			// i and j are the number of increments toward paper and scissors, respectively
+			for (var i = 0; i <= NumAllelesPerBlob + 1; i++)
+			{
+				for (var j = 0; j < NumAllelesPerBlob + 1; j++)
+				{
+					if (j + i >= NumAllelesPerBlob + 1) continue;
+					
+					frequenciesToday.Add((float)entitiesToday.Count(
+						                     x => 
+						                     Registry.Strategies[x].Count(y => y == 1) == i 
+						                     && Registry.Strategies[x].Count(y => y == 2) == j) 
+					                     / entitiesToday.Count);
+				}
+			}
+			
+			frequenciesByDay.Add(frequenciesToday);
+		}
+
+		return frequenciesByDay;
+	}
+	
 }
