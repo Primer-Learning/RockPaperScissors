@@ -36,18 +36,23 @@ public partial class MixedStrategyExploration : AnimationSequence
     {
         // Run the simulation
         var sim = new EvoGameTheorySim();
-        sim.RpsGame = new EvoGameTheorySim.RPSGame(
-            winMagnitude: 0.5f,
-            tieCost: 0f
-        );
-        sim.InitialAlleleFrequencies = new[] { 1f, 0f, 0f };
         AddChild(sim);
+        sim.RpsGame = new EvoGameTheorySim.RPSGame(
+            winMagnitude: 1f,
+            tieCost: 0.0f
+        );
+        // sim.InitialAlleleFrequencies = new[] { 1f, 1f, 1f };
+        sim.NumAllelesPerBlob = 3;
+        sim.InitializeByAlleleFrequency = false;
+        sim.InitialMixedStrategyDistribution = new Dictionary<int[], float>
+        {
+            {new []{3, 0, 0}, 1}
+        };
         sim.NumDays = 2000;
         sim.InitialBlobCount = 400;
         sim.MutationRate = 0.0001f;
-        sim.NumTrees = 400;
+        sim.NumTrees = 200;
         sim.Seed = seed;
-        sim.NumAllelesPerBlob = 10;
         sim.RunSim();
 
         var simAnimator = EvoGameTheorySimAnimator.NewSimAnimator(new Vector2(20, 20));

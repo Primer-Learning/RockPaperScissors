@@ -81,17 +81,27 @@ public partial class EvoGameTheorySim : Node
 			Scissors
 		}
 
-		public Strategy[] StrategyOptions = Enum.GetValues<Strategy>();
+		public readonly Strategy[] StrategyOptions = Enum.GetValues<Strategy>();
 
 		public (float reward1, float reward2) GetRewards(int strategy1, int strategy2)
 		{
-			return (RewardMatrix[strategy1, strategy2] - GlobalCost, RewardMatrix[strategy2, strategy1] - GlobalCost);
+			return (
+				RewardMatrix[strategy1, strategy2] + RewardModifiers[strategy1, strategy2] - GlobalCost,
+				RewardMatrix[strategy2, strategy1] + RewardModifiers[strategy2, strategy1] - GlobalCost
+			);
 		}
 
 		private const float GlobalCost = 0.0f;
 
 		private readonly float winMagnitude = 1f;
 		private readonly float tieCost = 0.0f;
+
+		public float[,] RewardModifiers => new float[3, 3]
+		{
+			{ 0, 0, 0 },
+			{ 0, 0, 0 },
+			{ 0, 0, 0 }
+		};
 
 		private float[,] RewardMatrix => new float[3, 3]
 		{
@@ -109,7 +119,9 @@ public partial class EvoGameTheorySim : Node
 	public int InitialBlobCount = 32;
 	public int NumTrees = 50;
 	public float MutationRate = 0;
+	public bool InitializeByAlleleFrequency = true;
 	public float[] InitialAlleleFrequencies;
+	public Dictionary<int[], float> InitialMixedStrategyDistribution;
 	public int NumAllelesPerBlob = 1;
 
 	#endregion
@@ -124,55 +136,108 @@ public partial class EvoGameTheorySim : Node
 	{
 		_rng = new Rng(Seed == -1 ? System.Environment.TickCount : Seed);
 		RpsGame ??= new RPSGame();
-
-		if (InitialAlleleFrequencies is not { Length: 3 })
-		{
-			GD.PushWarning("No valid initial frequencies defined. Using even distribution.");
-			InitialAlleleFrequencies = new[] { 1 / 3f, 1 / 3f, 1 / 3f };
-		}
-
-		var sum = InitialAlleleFrequencies.Sum();
-		if (Mathf.Abs(sum - 1) > 0.001f) GD.PushWarning("Initial allele frequencies don't add to 1. Normalizing.");
-		InitialAlleleFrequencies = InitialAlleleFrequencies.Select(x => x / sum).ToArray();
-
-		var initialAlleleCounts =
-			InitialAlleleFrequencies.Select(
-				x => Mathf.RoundToInt(x * InitialBlobCount * NumAllelesPerBlob)
-			).ToArray();
-
+		
 		EntitiesByDay = new List<EntityID>[NumDays + 1];
 
-		var blobIDs = new List<EntityID>();
-		for (var i = 0; i < InitialBlobCount; i++)
+		if (InitializeByAlleleFrequency)
 		{
-			// Figure out the strategy alleles
-			var strategyAlleles = new int[NumAllelesPerBlob];
-			for (var j = 0; j < NumAllelesPerBlob; j++)
+			// Check for valid initial frequencies
+			if (InitialAlleleFrequencies is not { Length: 3 })
 			{
-				// First, choose an allele type at random
-				var stratIndex = _rng.RangeInt(3);
-				// If there are alleles left to pass out, make sure we picked a type that remains
-				if (initialAlleleCounts.Sum() > 0)
-				{
-					while (initialAlleleCounts[stratIndex] == 0)
-					{
-						stratIndex = _rng.RangeInt(3);
-					}
-				}
-
-				// Assign the allele and decrement the number remaining of that allele
-				strategyAlleles[j] = stratIndex;
-				initialAlleleCounts[stratIndex] -= 1;
+				GD.PushWarning("No valid initial frequencies defined. Using even distribution.");
+				InitialAlleleFrequencies = new[] { 1 / 3f, 1 / 3f, 1 / 3f };
 			}
 
-			// Create the blob and assign the strategy alleles
-			blobIDs.Add(Registry.CreateBlob(
-				strategyAlleles,
-				-1
-			));
-		}
+			// Normalize
+			var sum = InitialAlleleFrequencies.Sum();
+			if (Mathf.Abs(sum - 1) > 0.001f) GD.PushWarning("Initial allele frequencies don't add to 1. Normalizing.");
+			InitialAlleleFrequencies = InitialAlleleFrequencies.Select(x => x / sum).ToArray();
 
-		EntitiesByDay[0] = blobIDs;
+			
+			var initialAlleleCounts =
+				InitialAlleleFrequencies.Select(
+					x => Mathf.RoundToInt(x * InitialBlobCount * NumAllelesPerBlob)
+				).ToArray();
+
+			var blobIDs = new List<EntityID>();
+			for (var i = 0; i < InitialBlobCount; i++)
+			{
+				// Figure out the strategy alleles
+				var strategyAlleles = new int[NumAllelesPerBlob];
+				for (var j = 0; j < NumAllelesPerBlob; j++)
+				{
+					// First, choose an allele type at random
+					var stratIndex = _rng.RangeInt(3);
+					// If there are alleles left to pass out, make sure we picked a type that remains
+					if (initialAlleleCounts.Sum() > 0)
+					{
+						while (initialAlleleCounts[stratIndex] == 0)
+						{
+							stratIndex = _rng.RangeInt(3);
+						}
+					}
+
+					// Assign the allele and decrement the number remaining of that allele
+					strategyAlleles[j] = stratIndex;
+					initialAlleleCounts[stratIndex] -= 1;
+				}
+
+				// Create the blob and assign the strategy alleles
+				blobIDs.Add(Registry.CreateBlob(
+					strategyAlleles,
+					-1
+				));
+			}
+			EntitiesByDay[0] = blobIDs;
+		}
+		else
+		{
+			// Check that initial strategy distribution is valid
+			var sum = 0f;
+			foreach (var pair in InitialMixedStrategyDistribution)
+			{
+				sum += pair.Value;
+
+				if (pair.Key.Sum() != NumAllelesPerBlob)
+				{
+					GD.PrintErr($"{string.Join(", ", pair.Key)} is not a valid mixed strategy, since there should be {NumAllelesPerBlob} alleles per blob.");
+				}
+				if (pair.Key.Length != RpsGame.StrategyOptions.Length)
+				{
+					GD.PrintErr($"{string.Join(", ", pair.Key)} is not a valid mixed strategy. There should be {RpsGame.StrategyOptions.Length} strategies specified.");
+				}
+			}
+
+			var normalizedInitialMixedStrategyDistribution = 
+				InitialMixedStrategyDistribution.ToDictionary(pair => pair.Key, pair => pair.Value / sum);
+
+			// Normalize it
+			
+			var blobIDs = new List<EntityID>();
+			foreach (var pair in normalizedInitialMixedStrategyDistribution)
+			{
+				GD.Print($"{pair.Key[0]}, {pair.Key[1]}, {pair.Key[2]}");
+
+				var listOfIndividualStrategies = new List<int>();
+				var stratIndex = 0;
+				foreach (var alleleCount in pair.Key)
+				{
+					listOfIndividualStrategies.AddRange(Enumerable.Repeat(stratIndex, alleleCount));
+					stratIndex++;
+				}
+				
+				for (var i = 0; i < Mathf.CeilToInt(pair.Value * InitialBlobCount); i++)
+				{
+					blobIDs.Add(
+						Registry.CreateBlob(
+							listOfIndividualStrategies.ToArray(),
+							-1
+						)
+					);
+				}
+			}
+			EntitiesByDay[0] = blobIDs;
+		}
 	}
 
 	private void Simulate()
@@ -230,7 +295,6 @@ public partial class EvoGameTheorySim : Node
 		// Make a copy
 		var childStrategies = strategies.ToArray();
 		
-
 		// Mutations
 		for (var i = 0; i < childStrategies.Length; i++)
 		{
@@ -317,10 +381,8 @@ public partial class EvoGameTheorySim : Node
 					                     / entitiesToday.Count);
 				}
 			}
-			
 			frequenciesByDay.Add(frequenciesToday);
 		}
-
 		return frequenciesByDay;
 	}
 	
